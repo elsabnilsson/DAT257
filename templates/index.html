@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+</head>
+<body>
+    <h2>Enter your details</h2>
+    <form method="POST">
+        <label>Age:</label>
+        <input type="number" name="age" value="{{ age if age is not none else '' }}" required><br>
+        
+        <label>Height (cm):</label>
+        <input type="number" name="height" value="{{ height if height is not none else '' }}" required><br>
+        
+        <label>Weight (kg):</label>
+        <input type="number" name="weight" value="{{ weight if weight is not none else '' }}" required><br>
+        
+        <button type="submit">Calculate BMI</button>
+    </form>
+
+    {% if bmi is not none %}
+        <h3>Your BMI: {{ bmi }}</h3>
+    {% endif %}
+</body>
+</html>
