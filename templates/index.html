@@ -52,11 +52,14 @@
             </div>
           </form>
 
-          {% if bmi is not none %}
-            <div class="alert alert-info mt-4">
-              <strong>Your BMI:</strong> {{ bmi }}
-            </div>
-          {% endif %}
+          {% if bmi is not none and bmi is string == false %}
+          <div class="alert alert-info mt-4">
+            <strong>Your BMI:</strong> {{ bmi }}
+          </div>
+        {% endif %}
+        
+        {% include "bmi_visual.html" %}
+        
         </div>
       </div>
     </div>
