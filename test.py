@@ -2,6 +2,25 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
+def calculate_nutrition(age, height, weight, activity):
+    
+        
+        bmr = 10 * weight + 6.25 * 100 * height - 5 * age + 5
+
+        activity_factor = {
+            "inactive": 1.2,
+            "moderate": 1.45,
+            "active": 1.7
+        }
+        calories = round(bmr * activity_factor[activity], 1)
+
+        protein = round((calories * 0.30) / 4, 1)
+        fat = round((calories * 0.30) / 9, 1)
+        carbs = round((calories * 0.40) / 4, 1)
+
+        return calories, protein, fat, carbs
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     age = height = weight = activity = ""
@@ -11,6 +30,7 @@ def index():
         age_input = request.form.get("age", "")
         height_input = request.form.get("height", "")
         weight_input = request.form.get("weight", "")
+        activity = request.form.get("activity", "active")
 
         try:
             age = int(age_input) if age_input else ""
@@ -20,39 +40,12 @@ def index():
             # Calculate BMI
             if height > 0 and weight > 0:
                 bmi = round(weight / (height ** 2), 2)
+                calories, protein, fat, carbs = calculate_nutrition(age, height, weight, activity)
 
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
 
-
-    #protein, fat and carbohydrates calculation
-    if request.method == "POST":
-        weight_input = request.form.get("weight", "")
-        activity = request.form.get("activity", "active")  # default to active
-
-        try:
-            weight = float(weight_input) if weight_input else None
-
-            if weight > 0:
-            
-                # Calories based on activity
-                activity_factor = {"sedentary": 25, "moderate": 30, "active": 35}
-                calories = round(weight * activity_factor[activity])
-                
-                # Protein calculation
-                protein = round(weight * 1.6, 1)
-                protein_kcal = protein * 4
-
-                # Fat: 25% of calories
-                fat_kcal = calories * 0.25
-                fat = round(fat_kcal / 9, 1)
-
-                # Carbs: remaining calories
-                carbs_kcal = calories - protein_kcal - fat_kcal
-                carbs = round(carbs_kcal / 4, 1)
-        except ValueError:
-            weight = "Invalid input. Please enter valid numbers."
-
+    
 
     return render_template(
         "index.html",
