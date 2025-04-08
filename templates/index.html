@@ -49,32 +49,53 @@
                 required
               />
             </div>
-
-            <!-- Activity Level -->
             <div class="mt-4">
-            <label class="form-label d-block mb-1">Activity Level</label>
+              <label class="form-label d-block mb-1">Activity Level</label>
+              <style>
 
-            {% for level in ['active', 'moderate', 'inactive'] %}
-              <div class="form-check mb-1">
-                <input 
-                  class="form-check-input" 
-                  type="radio" 
-                  name="activity" 
-                  id="activity-{{ level }}"  
-                  value="{{ level }}" 
-                  {% if activity == level %}checked{% endif %}
-                  required
-                >
-                <label 
-                  class="form-check-label text-capitalize" 
-                  for="activity-{{ level }}" 
-                >
-                  {{ level }}
-                </label>
+                .btn-check:checked + .btn,
+                .btn-check:focus + .btn {
+                  border-color: #433118;
+                  background-color: #433118;
+                  color: white;
+                }
+                .btn-check:not(:checked) + .btn {
+                  border-color: #bbb;
+                  color: #433118; 
+                }
+              
+                .btn-check:not(:checked) + .btn:hover {
+                  border-color: #433118;
+                  color: #433118;
+                  background-color: rgba(67, 49, 24, 0.05);
+                }
+              </style>
+              
+
+                <div class="btn-group w-100 c-#433118 " role="group" aria-label="Activity level buttons" >
+                  {% for level in ['active', 'moderate', 'inactive'] %}
+                    <input 
+                      type="radio" 
+                      class="btn-check" 
+                      name="activity" 
+                      id="activity-{{ level }}" 
+                      value="{{ level }}"
+                      {% if activity == level %}checked{% endif %}
+                      required
+                      autocomplete="off"
+                      
+                    >
+                    <label 
+                      class="btn btn-outline-primary text-capitalize" 
+                      for="activity-{{ level }}"
+                    >
+                      {{ level }}
+                    </label>
+
+                  {% endfor %}
+                </div>
               </div>
-            {% endfor %}
-          </div>
-
+              
 
 
           <div class="row mt-4">

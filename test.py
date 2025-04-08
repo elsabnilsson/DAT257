@@ -42,7 +42,7 @@ def index():
         calories=calories,
         fat=fat,
         carbs=carbs,
-        age=age,
+        age=age,    
         height=height * 100 if height else "",
         weight=weight if weight else "",
         activity=activity
