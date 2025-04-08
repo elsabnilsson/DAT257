@@ -1,33 +1,54 @@
+from activitylevel import InactiveNutrition, ModerateNutrition, ActiveNutrition
+from person import Person
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    age = height = weight = ""
-    bmi = None
+    age = height = weight = activity = ""
+    bmi = protein = calories = fat = carbs = None
 
     if request.method == "POST":
-        age = request.form.get("age", "")
-        height = request.form.get("height", "")
-        weight = request.form.get("weight", "")
+        age_input = request.form.get("age", "")
+        height_input = request.form.get("height", "")
+        weight_input = request.form.get("weight", "")
+        activity = request.form.get("activity", "active")
 
         try:
-            if age:
-                age = int(age)
-            if height:
-                height = float(height) / 100  # Convert cm to meters
-            if weight:
-                weight = float(weight)
+            age = int(age_input)
+            height = float(height_input) / 100
+            weight = float(weight_input)
 
-            if height > 0 and weight > 0:
-                bmi = round(weight / (height ** 2), 2)
-            else:
-                bmi = "Height and weight must be positive numbers."
+            person = Person(age, height, weight)
+            bmi = person.calculate_bmi()
+
+            strategy_map = {
+                "inactive": InactiveNutrition(),
+                "moderate": ModerateNutrition(),
+                "active": ActiveNutrition()
+            }
+
+            strategy = strategy_map.get(activity, ActiveNutrition())
+            calories, protein, fat, carbs = strategy.calculate_macros(person)
+
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
 
-    return render_template("index.html", bmi=bmi, age=age, height=height * 100 if height else "", weight=weight)
+    return render_template(
+        "index.html",
+        bmi=bmi,
+        protein=protein,
+        calories=calories,
+        fat=fat,
+        carbs=carbs,
+        age=age,    
+        height=height * 100 if height else "",
+        weight=weight if weight else "",
+        activity=activity
+    )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
