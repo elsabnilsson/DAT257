@@ -100,39 +100,44 @@
 
           <div class="row mt-4">
             <div class="mb-3">
-              <input type="submit" class="btn btn-primary" value="Calculate" />
+              <input type="submit" class="btn btn-primary w-100" style="background-color: #433118;" value="Calculate" />
             </div>
           
           </form>
-
           {% if bmi is not none %}
-            <div class="alert alert-success">
-              <strong>Your BMI:</strong> {{ bmi }}
-            </div>
-          {% endif %}
-
-          {% if calories %}
           <div class="alert alert-success">
-            <strong>Estimated Daily Calories:</strong> {{ calories }} kcal
+            
+            <div style="padding-bottom: 0%; font-size: 16pt;">
+                <strong>Your BMI: </strong> {{ bmi }}
+            </div>
+            <hr width="100%" size="2">
+            <div style="padding-bottom: 2%; font-size: 16pt;">
+                <strong>RECOMENDED DAILY </strong>
+            </div>
+            {% if calories %}
+            <div>
+                <strong>Calories: </strong> {{ calories }} kcal
+            </div>
+            {% endif %}
+        
+            {% if protein is not none %}
+                <div>
+                <strong>Protein: </strong> {{ protein }} grams/day
+                </div>
+            {% endif %}
+        
+            {% if fat %}
+                <div>
+                <strong>Fat: </strong> {{ fat }} grams/day
+                </div>
+            {% endif %}
+            
+            {% if carbs %}
+                <div>
+                <strong>Carbs: </strong> {{ carbs }} grams/day
+                </div>
+            {% endif %}
           </div>
-          {% endif %}
-    
-          {% if protein is not none %}
-            <div class="alert alert-success">
-              <strong>Recommended Protein Intake:</strong> {{ protein }} grams/day
-            </div>
-          {% endif %}
-    
-          {% if fat %}
-            <div class="alert alert-success">
-              <strong>Recommended Fat Intake:</strong> {{ fat }} grams/day
-            </div>
-          {% endif %}
-          
-          {% if carbs %}
-            <div class="alert alert-success">
-              <strong>Recommended Carbs Intake:</strong> {{ carbs }} grams/day
-            </div>
           {% endif %}
         </div>
       </div>
