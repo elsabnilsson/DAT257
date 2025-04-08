@@ -17,6 +17,7 @@
         <div class="col-md-4"style="display: block; margin-left: auto; margin-right: auto;">
           <form method="post">
             <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+              <label for="age" class="form-label">Age</label>
               <input
                 type="text"
                 class="form-control"
@@ -28,6 +29,7 @@
               />
             </div>
             <div class="mb-3" style="padding-bottom: 6%;">
+              <label for="height" class="form-label">Height</label>
               <input
                 type="text"
                 class="form-control"
@@ -39,6 +41,7 @@
               />
             </div>
             <div class="mb-3" style="padding-bottom: 3%;">
+              <label for="weight" class="form-label">Weight</label>
               <input
                 type="text"
                 class="form-control"
@@ -111,6 +114,9 @@
             <div style="padding-bottom: 0%; font-size: 16pt;">
                 <strong>Your BMI: </strong> {{ bmi }}
             </div>
+           
+         
+         {% include "bmi_visual.html" %}
             <hr width="100%" size="2">
             <div style="padding-bottom: 2%; font-size: 16pt;">
                 <strong>RECOMENDED DAILY </strong>
