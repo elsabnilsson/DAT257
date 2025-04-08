@@ -38,7 +38,7 @@
                 required
               />
             </div>
-            <div class="mb-3" style="padding-bottom: 6%;">
+            <div class="mb-3" style="padding-bottom: 3%;">
               <input
                 type="text"
                 class="form-control"
@@ -73,7 +73,7 @@
               
 
                 <div class="btn-group w-100 c-#433118 " role="group" aria-label="Activity level buttons" >
-                  {% for level in ['active', 'moderate', 'inactive'] %}
+                  {% for level in ['inactive', 'moderate', 'active'] %}
                     <input 
                       type="radio" 
                       class="btn-check" 
@@ -100,7 +100,7 @@
 
           <div class="row mt-4">
             <div class="mb-3">
-              <input type="submit" class="btn btn-primary w-100" style="background-color: #433118;" value="Calculate" />
+              <input type="submit" class="btn btn-primary w-100" style="background-color: #433118; border-color: #433118;" value="Calculate" />
             </div>
           
           </form>
