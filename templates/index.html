@@ -9,13 +9,15 @@
     />
   </head>
   <body style="background-color: #f7e5c1;">
-    <div class="container mt-5" style="text-align: center; ">
+    <div class="container mt-5" style="text-align: center;">
       <div class="row">
-      <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
       </div>
+
       <div class="row">
-        <div class="col-md-4"style="display: block; margin-left: auto; margin-right: auto;">
+        <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
           <form method="post">
+            
             <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               <input
                 type="text"
@@ -27,6 +29,7 @@
                 required
               />
             </div>
+
             <div class="mb-3" style="padding-bottom: 6%;">
               <input
                 type="text"
@@ -38,6 +41,7 @@
                 required
               />
             </div>
+
             <div class="mb-3" style="padding-bottom: 3%;">
               <input
                 type="text"
@@ -49,106 +53,104 @@
                 required
               />
             </div>
-            <div class="mt-4">
-              <label class="form-label d-block mb-1">Activity Level</label>
-              <style>
 
-                .btn-check:checked + .btn,
-                .btn-check:focus + .btn {
+            <div class="mb-4">
+              <div class="h5">
+                <label class="form-label d-block mb-1">Activity Level</label>
+
+                <style>
+                  .btn-check:checked + .btn,
+                  .btn-check:focus + .btn {
+                    border-color: #433118;
+                    background-color: #433118;
+                    color: white;
+                  }
+                  .btn-check:not(:checked) + .btn {
+                    border-color: #bbb;
+                    color: #433118;
+                  }
+                  .btn-check:not(:checked) + .btn:hover {
+                    border-color: #433118;
+                    color: #433118;
+                    background-color: rgba(67, 49, 24, 0.05);
+                  }
+                </style>
+              </div>
+
+              <div class="btn-group w-100 c-#433118" role="group" aria-label="Activity level buttons">
+                {% for level in ['inactive', 'moderate', 'active'] %}
+                  <input 
+                    type="radio" 
+                    class="btn-check" 
+                    name="activity" 
+                    id="activity-{{ level }}" 
+                    value="{{ level }}"
+                    {% if activity == level %}checked{% endif %}
+                    required
+                    autocomplete="off"
+                  >
+                  <label 
+                    class="btn btn-outline-primary text-capitalize" 
+                    for="activity-{{ level }}"
+                  >
+                    {{ level }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <input type="submit" class="btn btn-calculate" value="Calculate" />
+
+              <style>
+                .btn-calculate, .btn-calculate:hover {
                   border-color: #433118;
                   background-color: #433118;
                   color: white;
                 }
-                .btn-check:not(:checked) + .btn {
-                  border-color: #bbb;
-                  color: #433118; 
-                }
-              
-                .btn-check:not(:checked) + .btn:hover {
-                  border-color: #433118;
-                  color: #433118;
-                  background-color: rgba(67, 49, 24, 0.05);
-                }
               </style>
-              
-
-                <div class="btn-group w-100 c-#433118 " role="group" aria-label="Activity level buttons" >
-                  {% for level in ['inactive', 'moderate', 'active'] %}
-                    <input 
-                      type="radio" 
-                      class="btn-check" 
-                      name="activity" 
-                      id="activity-{{ level }}" 
-                      value="{{ level }}"
-                      {% if activity == level %}checked{% endif %}
-                      required
-                      autocomplete="off"
-                      
-                    >
-                    <label 
-                      class="btn btn-outline-primary text-capitalize" 
-                      for="activity-{{ level }}"
-                    >
-                      {{ level }}
-                    </label>
-
-                  {% endfor %}
-                </div>
-              </div>
-              
-
-
-          <div class="row mt-4">
-            <div class="mb-3">
-              <input type="submit" class="btn btn-primary w-100" style="background-color: #433118; border-color: #433118;" value="Calculate" />
             </div>
-          
           </form>
+
           {% if bmi is not none %}
-          <div class="alert alert-success">
-            
-            <div style="padding-bottom: 0%; font-size: 16pt;">
+            <div class="alert alert-success">
+              <div style="padding-bottom: 0%; font-size: 16pt;">
                 <strong>Your BMI: </strong> {{ bmi }}
-            </div>
-            <hr width="100%" size="2">
-            <div style="padding-bottom: 2%; font-size: 16pt;">
+              </div>
+
+              <hr width="100%" size="2">
+
+              <div style="padding-bottom: 2%; font-size: 16pt;">
                 <strong>RECOMENDED DAILY </strong>
+              </div>
+
+              {% if calories %}
+                <div>
+                  <strong>Calories: </strong> {{ calories }} kcal
+                </div>
+              {% endif %}
+
+              {% if protein is not none %}
+                <div>
+                  <strong>Protein: </strong> {{ protein }} grams/day
+                </div>
+              {% endif %}
+
+              {% if fat %}
+                <div>
+                  <strong>Fat: </strong> {{ fat }} grams/day
+                </div>
+              {% endif %}
+
+              {% if carbs %}
+                <div>
+                  <strong>Carbs: </strong> {{ carbs }} grams/day
+                </div>
+              {% endif %}
             </div>
-            {% if calories %}
-            <div>
-                <strong>Calories: </strong> {{ calories }} kcal
-            </div>
-            {% endif %}
-        
-            {% if protein is not none %}
-                <div>
-                <strong>Protein: </strong> {{ protein }} grams/day
-                </div>
-            {% endif %}
-        
-            {% if fat %}
-                <div>
-                <strong>Fat: </strong> {{ fat }} grams/day
-                </div>
-            {% endif %}
-            
-            {% if carbs %}
-                <div>
-                <strong>Carbs: </strong> {{ carbs }} grams/day
-                </div>
-            {% endif %}
-          </div>
           {% endif %}
         </div>
       </div>
     </div>
   </body>
 </html>
-
-
-
-
-
-
-        
-       
