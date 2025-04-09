@@ -106,6 +106,16 @@
 
             <div class="mb-3" style="padding-bottom: 6%;">
               
+              <select class="form-select" name="gender" id="gender" required>
+                <option value="">Gender</option>
+                <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
+                <option value="female" {% if gender == "female" %}selected{% endif %}>Female</option>
+                <option value="other" {% if gender == "other" %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+
+            <div class="mb-3" style="padding-bottom: 6%;">
+              
               <input
                 type="number"
                 class="form-control"

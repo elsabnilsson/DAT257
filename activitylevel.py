@@ -7,7 +7,7 @@ class InactiveNutrition(NutritionStrategy):
 
 class ModerateNutrition(NutritionStrategy):
     def get_activity_factor(self):
-        return 1.45
+        return 1.5
 
 class ActiveNutrition(NutritionStrategy):
     def get_activity_factor(self):
