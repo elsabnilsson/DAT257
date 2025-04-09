@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    age = height = weight = activity = ""
+    age = height = weight = activity = gender = ""
     bmi = protein = calories = fat = carbs = None
 
     if request.method == "POST":
@@ -14,13 +14,14 @@ def index():
         height_input = request.form.get("height", "")
         weight_input = request.form.get("weight", "")
         activity = request.form.get("activity", "active")
+        gender = request.form.get("gender", "other")
 
         try:
             age = int(age_input)
             height = float(height_input) / 100
             weight = float(weight_input)
 
-            person = Person(age, height, weight)
+            person = Person(age, height, weight, gender)
             bmi = person.calculate_bmi()
 
             strategy_map = {
@@ -45,7 +46,8 @@ def index():
         age=age,    
         height=height * 100 if height else "",
         weight=weight if weight else "",
-        activity=activity
+        activity=activity,
+        gender=gender
     )
 
 
