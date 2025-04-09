@@ -100,15 +100,42 @@
             </div>
 
             <div class="mb-4">
-              <input type="submit" class="btn btn-calculate" value="Calculate" />
+              <input type="submit" class="btn btn-calculate w-100" value="Calculate" />
 
               <style>
-                .btn-calculate, .btn-calculate:hover {
+                .btn-calculate {
                   border-color: #433118;
                   background-color: #433118;
                   color: white;
+                  transition: transform 0.2s ease, box-shadow 0.3s ease;
+                }
+              
+                .btn-calculate:hover {
+                  transform: scale(1.05);
+                  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+                  color: white;
+                  background-color: #5D7A3A;
+                  border-color: white;
+                  animation: shake 0.4s;
+                    animation-iteration-count: infinite;
+                  }
+
+                  @keyframes shake {
+                    0% { transform: translateX(0); }
+                    20% { transform: translateX(-5px); }
+                    40% { transform: translateX(5px); }
+                    60% { transform: translateX(-5px); }
+                    80% { transform: translateX(5px); }
+                    100% { transform: translateX(0); }
+                  }
+              
+                .btn-calculate:active {
+                  transform: scale(0.95);
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+                  background-color:white;
                 }
               </style>
+              
             </div>
           </form>
 
