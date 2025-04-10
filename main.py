@@ -1,5 +1,6 @@
 from activitylevel import InactiveNutrition, ModerateNutrition, ActiveNutrition
 from person import Person
+from rec_water import calc_water_intake
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -7,7 +8,7 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def index():
     age = height = weight = activity = ""
-    bmi = protein = calories = fat = carbs = None
+    bmi = protein = calories = fat = carbs = water_intake = None
 
     if request.method == "POST":
         age_input = request.form.get("age", "")
@@ -31,6 +32,7 @@ def index():
 
             strategy = strategy_map.get(activity, ActiveNutrition())
             calories, protein, fat, carbs = strategy.calculate_macros(person)
+            water_intake = calc_water_intake(person, activity)
 
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
@@ -45,7 +47,8 @@ def index():
         age=age,    
         height=height * 100 if height else "",
         weight=weight if weight else "",
-        activity=activity
+        activity=activity,
+        water_intake=water_intake
     )
 
 
