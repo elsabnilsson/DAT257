@@ -31,7 +31,6 @@
         transition: transform 0.2s ease, box-shadow 0.3s ease;
       }
 
-      /* Shake Keyframes */
       @keyframes shake-light {
         0%, 100% { transform: scale(1); }
         25% { transform: scale(1.05); }
@@ -77,6 +76,22 @@
         background-color: white;
         color: #433118;
       }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-label-right {
+        position: absolute;
+        right: 34px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+        font-size: 0.9rem;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        opacity: 0;
+      }
     </style>
   </head>
   <body style="background-color: #f7e5c1;">
@@ -88,8 +103,7 @@
       <div class="row">
         <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
           <form method="post">
-            <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
-              
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               <input
                 type="number"
                 class="form-control"
@@ -100,12 +114,12 @@
                 required
                 min="18"
                 max="100"
-               
+                oninput="toggleLabel(this)"
               />
+              <span class="input-label-right" id="label-age">Age</span>
             </div>
 
-            <div class="mb-3" style="padding-bottom: 6%;">
-              
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               <input
                 type="number"
                 class="form-control"
@@ -116,11 +130,12 @@
                 required
                 step="0.1"
                 min="1"
+                oninput="toggleLabel(this)"
               />
+              <span class="input-label-right" id="label-height">Height (cm)</span>
             </div>
 
-            <div class="mb-3" style="padding-bottom: 3%;">
-              
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               <input
                 type="number"
                 class="form-control"
@@ -131,7 +146,9 @@
                 required
                 step="0.1"
                 min="1"
+                oninput="toggleLabel(this)"
               />
+              <span class="input-label-right" id="label-weight">Weight (kg)</span>
             </div>
 
             <div class="mb-4">
@@ -231,6 +248,19 @@
         clearTimeout(timer1);
         clearTimeout(timer2);
         btn.classList.remove('shake-light', 'shake-medium', 'shake-hard');
+      });
+
+      function toggleLabel(input) {
+        const label = document.getElementById("label-" + input.name);
+        if (input.value.trim()) {
+          label.style.opacity = 1;
+        } else {
+          label.style.opacity = 0;
+        }
+      }
+
+      document.querySelectorAll("input").forEach(input => {
+        toggleLabel(input);
       });
     </script>
   </body>
