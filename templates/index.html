@@ -1,7 +1,6 @@
-<!doctype html>
-<html>
-  <head>
-    <title>BMI Calculator</title>
+{% extends "base.html" %}
+{% block title %}BMI Calculator{% endblock %}
+{% block content %}
     <link
       rel="stylesheet"
       type="text/css"
@@ -116,6 +115,7 @@
                 required
                 step="0.1"
                 min="1"
+                max="300"
               />
             </div>
 
@@ -131,34 +131,51 @@
                 required
                 step="0.1"
                 min="1"
+                max="500"
               />
             </div>
 
             <div class="mb-4">
               <div class="h5">
                 <label class="form-label d-block mb-1">Activity Level</label>
-              </div>
-
-              <div class="btn-group w-100 c-#433118" role="group" aria-label="Activity level buttons">
-                {% for level in ['inactive', 'moderate', 'active'] %}
-                  <input 
-                    type="radio" 
-                    class="btn-check" 
-                    name="activity" 
-                    id="activity-{{ level }}" 
-                    value="{{ level }}"
-                    {% if activity == level %}checked{% endif %}
-                    required
-                    autocomplete="off"
-                  >
-                  <label 
-                    class="btn btn-outline-primary text-capitalize" 
-                    for="activity-{{ level }}"
-                  >
-                    {{ level }}
-                  </label>
-                {% endfor %}
-              </div>
+                {% set explanations = {
+                  'inactive': 'Sedentary: little or no exercise (factor 1.2)',
+                  'moderate': 'Lightly active: moderate exercise or daily activity (factor 1.45)',
+                  'active': 'Active: intensive exercise or physically demanding activity (factor 1.7)'
+                } %}
+                
+                <div class="btn-group w-100" role="group" aria-label="Activity level buttons">
+                  {% for level in ['inactive', 'moderate', 'active'] %}
+                    <input 
+                      type="radio" 
+                      class="btn-check" 
+                      name="activity" 
+                      id="activity-{{ level }}" 
+                      value="{{ level }}"
+                      {% if activity == level %}checked{% endif %}
+                      required
+                      autocomplete="off"
+                    >
+                    <label 
+                      class="btn btn-outline-primary text-capitalize" 
+                      for="activity-{{ level }}"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      data-bs-title="{{ explanations[level] }}"
+                    >
+                      {{ level }}
+                    </label>
+                  {% endfor %}
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                  });
+                </script>
+            
+              
             </div>
 
             <div class="mb-4">
@@ -234,4 +251,4 @@
       });
     </script>
   </body>
-</html>
+{% endblock %}
