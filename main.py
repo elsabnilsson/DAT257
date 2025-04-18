@@ -48,6 +48,18 @@ def index():
         activity=activity
     )
 
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
+
+@app.route("/recipes")
+def recipes():
+    return render_template("recipes.html")
+
+@app.route("/workouts")
+def workouts():
+    return render_template("workouts.html")
+
 
 
 if __name__ == "__main__":
