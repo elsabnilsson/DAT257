@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "POST"])
 def index():
     age = height = weight = activity = gender = ""
-    bmi = protein = calories = fat = carbs = None
+    bmi = protein = calories = fat = carbs = meal_plan = None
 
     if request.method == "POST":
         age_input = request.form.get("age", "")
@@ -32,6 +32,7 @@ def index():
 
             strategy = strategy_map.get(activity, ActiveNutrition())
             calories, protein, fat, carbs = strategy.calculate_macros(person)
+            meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
 
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
@@ -47,7 +48,8 @@ def index():
         height=height * 100 if height else "",
         weight=weight if weight else "",
         activity=activity,
-        gender=gender
+        gender=gender,
+        meal_plan=meal_plan 
     )
 
 
