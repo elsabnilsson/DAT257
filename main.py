@@ -7,21 +7,22 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    age = height = weight = activity = ""
-    bmi = protein = calories = fat = carbs = water_intake = None
+    age = height = weight = activity = gender = ""
+    bmi = protein = calories = fat = carbs = water_intake = meal_plan = None
 
     if request.method == "POST":
         age_input = request.form.get("age", "")
         height_input = request.form.get("height", "")
         weight_input = request.form.get("weight", "")
         activity = request.form.get("activity", "active")
+        gender = request.form.get("gender", "other")
 
         try:
             age = int(age_input)
             height = float(height_input) / 100
             weight = float(weight_input)
 
-            person = Person(age, height, weight)
+            person = Person(age, height, weight, gender)
             bmi = person.calculate_bmi()
 
             strategy_map = {
@@ -33,6 +34,7 @@ def index():
             strategy = strategy_map.get(activity, ActiveNutrition())
             calories, protein, fat, carbs = strategy.calculate_macros(person)
             water_intake = calc_water_intake(person, activity)
+            meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
 
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
@@ -48,7 +50,9 @@ def index():
         height=height * 100 if height else "",
         weight=weight if weight else "",
         activity=activity,
-        water_intake=water_intake
+        water_intake=water_intake,
+        gender=gender,
+        meal_plan=meal_plan 
     )
 
 @app.route("/stats")

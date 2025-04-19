@@ -157,6 +157,16 @@
               <span class="input-label-right" id="label-age">Age</span>
             </div>
 
+            <div class="mb-3" style="padding-bottom: 6%;">
+              
+              <select class="form-select" name="gender" id="gender" required>
+                <option value="">Gender</option>
+                <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
+                <option value="female" {% if gender == "female" %}selected{% endif %}>Female</option>
+                <option value="other" {% if gender == "other" %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+
             <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               <input
                 type="number"
@@ -167,9 +177,9 @@
                 placeholder="Height (cm)"
                 required
                 step="0.1"
-                min="1"
+                min="120"
+                max="250"
                 oninput="toggleLabel(this)"
-                max="300"
               />
               <span class="input-label-right" id="label-height">Height (cm)</span>
             </div>
@@ -184,7 +194,8 @@
                 placeholder="Weight (kg)"
                 required
                 step="0.1"
-                min="1"
+                min="30"
+                max="300"
               />
               <span class="input-label-right" id="label-weight">Weight (kg)</span>
             </div>
@@ -310,8 +321,42 @@
             {% endif %}
           {% endif %}
         </div>
+
+
+{% if meal_plan %}
+        <div class="alert alert-success">
+          <div style="padding-bottom: 0%; font-size: 16pt;">
+            <h2>Suggested Meal Split</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Meal</th>
+      <th>Calories</th>
+      <th>Protein (g)</th>
+      <th>Fat (g)</th>
+      <th>Carbs (g)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for meal, macros in meal_plan.items() %}
+    <tr>
+      <td>{{ meal }}</td>
+      <td>{{ macros.calories }}</td>
+      <td>{{ macros.protein }}</td>
+      <td>{{ macros.fat }}</td>
+      <td>{{ macros.carbs }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+          </div>
+
+        </div>
+        {% endif %}
       </div>
     </div>
+
 
     <script>
       const btn = document.querySelector('.btn-calculate');
