@@ -2,8 +2,12 @@ from activitylevel import InactiveNutrition, ModerateNutrition, ActiveNutrition
 from person import Person
 from rec_water import calc_water_intake
 from flask import Flask, render_template, request
+from recipes_api import get_recipes
+from flask import session
+import os
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -32,6 +36,9 @@ def index():
 
             strategy = strategy_map.get(activity, ActiveNutrition())
             calories, protein, fat, carbs = strategy.calculate_macros(person)
+            session["rec_calories"] = calories
+            session["rec_protein"]  = protein
+            session["rec_carbs"]    = carbs
             water_intake = calc_water_intake(person, activity)
 
         except ValueError:
@@ -57,7 +64,36 @@ def stats():
 
 @app.route("/recipes")
 def recipes():
-    return render_template("recipes.html")
+
+    query = request.args.get("query", "side salad")
+
+    rec_cal  = session.get("rec_calories")
+    rec_prot = session.get("rec_protein")
+    rec_carb = session.get("rec_carbs")
+
+    if rec_cal and rec_prot and rec_carb:
+        min_cal = int(rec_cal * 0.1)
+        max_cal = int(rec_cal * 7)
+        min_prot = int(rec_prot * 0.1)
+        max_prot = int(rec_prot * 7)
+        min_carb = int(rec_carb * 0.1)
+        max_carb = int(rec_carb * 7)
+    else:
+        min_cal = max_cal = min_prot = max_prot = min_carb = max_carb = None
+
+    recipes_data = get_recipes(
+        query=query,
+        add_recipe_information=True,
+        add_recipe_instructions=True,
+        add_recipe_nutrition=True,
+        min_calories=min_cal,
+        max_calories=max_cal,
+        min_protein=min_prot,
+        max_protein=max_prot,
+        min_carbs=min_carb,
+        max_carbs=max_carb,
+    )
+    return render_template("recipes.html", recipes=recipes_data, query=query)
 
 @app.route("/workouts")
 def workouts():
