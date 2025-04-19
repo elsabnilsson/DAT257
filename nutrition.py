@@ -12,3 +12,23 @@ class NutritionStrategy(ABC):
         fat = round((calories * 0.30) / 9, 1)
         carbs = round((calories * 0.40) / 4, 1)
         return calories, protein, fat, carbs
+    
+    def meal_spli(self, calories, protein, fat, carbs):
+        meals = {
+            "Breakfast": 0.25,
+            "Lunch": 0.30,
+            "Dinner": 0.30,
+            "Snack": 0.15,   
+        }
+        
+        meal_plan = {}
+        
+        for meal, factor in meals.items():
+            meal_plan[meal] = {
+                "calories": round(calories * factor, 1),
+                "protein": round(protein * factor, 1),
+                "fat": round(fat * factor, 1),
+                "carbs": round(carbs * factor, 1)
+            }
+            
+        return meal_plan

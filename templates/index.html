@@ -180,7 +180,7 @@
             <div class="alert alert-success">
               <div style="padding-bottom: 0%; font-size: 16pt;">
                 <strong>Your BMI: </strong> {{ bmi }}
-            </div>
+              </div>
            
          
          {% include "bmi_visual.html" %}
@@ -215,8 +215,42 @@
           {% endif %}
 
         </div>
+
+
+{% if meal_plan %}
+        <div class="alert alert-success">
+          <div style="padding-bottom: 0%; font-size: 16pt;">
+            <h2>Suggested Meal Split</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Meal</th>
+      <th>Calories</th>
+      <th>Protein (g)</th>
+      <th>Fat (g)</th>
+      <th>Carbs (g)</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for meal, macros in meal_plan.items() %}
+    <tr>
+      <td>{{ meal }}</td>
+      <td>{{ macros.calories }}</td>
+      <td>{{ macros.protein }}</td>
+      <td>{{ macros.fat }}</td>
+      <td>{{ macros.carbs }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+          </div>
+
+        </div>
+        {% endif %}
       </div>
     </div>
+
 
     <script>
       const btn = document.querySelector('.btn-calculate');
