@@ -279,6 +279,21 @@
                   <strong>Water: </strong> {{ water_intake }} liter/day
                 </div>
               {% endif %}
+
+              <div class="mt-3">
+                <h6 style="font-size: 0.8em;">That's about this many glasses of water:</h6>
+                <div style="display: flex; flex-wrap: wrap; justify-content: left; width: 100%; margin-top: -3px; margin-bottom: -5px;">
+                  {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
+                  {% for i in range(glasses_count) %}
+                    <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
+                      <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 60px; height: 55px;">
+                    </div>
+                  {% endfor %}
+                </div>
+                <p class="text-muted" style="font-size: 0.6em; font-style: italic;">
+                  (each glass represent 0.25 liters of water)
+                </p>
+              </div>
             </div>
 
             {% if protein and fat and carbs %}
