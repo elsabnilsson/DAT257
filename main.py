@@ -26,6 +26,12 @@ def index():
             height = float(height_input) / 100
             weight = float(weight_input)
 
+            session["age"] = age
+            session["height"] = height
+            session["weight"] = weight
+            session["activity"] = activity
+            session["gender"] = gender
+
             person = Person(age, height, weight, gender)
             bmi = person.calculate_bmi()
 
@@ -45,6 +51,12 @@ def index():
 
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
+            
+    age = session.get("age", age)
+    height = session.get("height", height)
+    weight = session.get("weight", weight)
+    activity = session.get("activity", activity)
+    gender = session.get("gender", gender)
 
     return render_template(
         "index.html",
