@@ -282,6 +282,19 @@ def recipes():
 def workouts():
     return render_template("workouts.html")
 
+@app.route("/session-login", methods=["POST"])
+def session_login():
+    data = request.get_json()
+    id_token = data.get("idToken")
+
+    try:
+        decoded = auth.verify_id_token(id_token)
+        session["user_uid"] = decoded["uid"]
+        return "", 200
+    except Exception as e:
+        return str(e), 401
+
+
 
 
 if __name__ == "__main__":

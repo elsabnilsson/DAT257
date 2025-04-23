@@ -1,214 +1,87 @@
 {% extends "base.html" %}
 {% block content %}
-    <style>
-      .btn-check:checked + .btn,
-      .btn-check:focus + .btn {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-      }
-      .btn-check:not(:checked) + .btn {
-        border-color: #bbb;
-        color: #433118;
-      }
-      .btn-check:not(:checked) + .btn:hover {
-        border-color: #433118;
-        color: #433118;
-        background-color: rgba(67, 49, 24, 0.05);
-      }
+<style>
+  .btn-calculate {
+    background-color: #433118;
+    color: white;
+    width: 100%;
+  }
+</style>
 
-      .btn-calculate {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-      }
-
-      @keyframes shake-light {
-        0%, 100% { transform: scale(1); }
-        25% { transform: scale(1.05); }
-        75% { transform: scale(0.95); }
-      }
-
-      @keyframes shake-medium {
-        0%, 100% { transform: scale(1); }
-        20% { transform: scale(1.1); }
-        80% { transform: scale(0.9); }
-      }
-
-      @keyframes shake-hard {
-        0%, 100% { transform: scale(1); }
-        15% { transform: scale(1.2); }
-        85% { transform: scale(0.8); }
-      }
-
-      .shake-light:hover {
-        animation: shake-light 0.3s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
-
-      .shake-medium:hover {
-        animation: shake-medium 0.2s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
-
-      .shake-hard:hover {
-        animation: shake-hard 0.15s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
-
-      .btn-calculate:active {
-        transform: scale(0.95);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        background-color: white;
-        color: #433118;
-      }
-
-      .input-wrapper {
-        position: relative;
-      }
-
-      .input-label-right {
-        position: absolute;
-        right: 34px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
-        font-size: 0.9rem;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        opacity: 0;
-      }
-
-      .tooltip-asterisk {
-        display: inline-block;
-        position: relative;
-        color: #888;
-        cursor: help;
-        margin-left: 4px;
-      }
-
-      .tooltip-asterisk:hover + .tooltip-text {
-        display: inline-block;
-      }
-
-      .tooltip-text {
-        display: none;
-        position: absolute;
-        background-color: #333;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 5px;
-        top: -5px;
-        left: 20px;
-        z-index: 1000;
-        font-size: 0.85rem;
-        white-space: normal;     
-        max-width: 250px;        
-        text-align: left;        
-      }
-
-    </style>
-
-  <body style="background-color: #f7e5c1;">
-    <div class="container mt-5" style="text-align: center;">
-      <div class="row">
-        <div class="position-relative text-center" style="display: inline-block;">
-          <div id="messageOverlay" style="
-            position: absolute;
-            top: 0px;
-            left: 48.5%;
-            transform: translateX(-50%) rotate(-10deg);
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #333;
-            z-index: 10;
-            white-space: nowrap;
-            text-align: center;
-          "></div>
-
-          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
-          <form method="post">
-            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
-              <input
-                type="email"
-                class="form-control"
-                name="email"
-                id="email"
-                placeholder="Email"
-                required
-                oninput="toggleLabel(this)"
-              />
-              <span class="input-label-right" id="label-age">Email</span>
-            </div>
-
-            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
-                <input
-                  type="password"
-                  class="form-control"
-                  name="password"
-                  id="password"
-                  placeholder="Password"
-                  required
-                  oninput="toggleLabel(this)"
-                />
-                <span class="input-label-right" id="label-age">Password</span>
-              </div>
-
-              <div class="mb-4">
-                <input type="submit" class="btn btn-calculate w-100 shake-light" value="Login" />
-              </div>
-            </form>
-
-
-
-    <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-
-            
-            </div>
-
-
+<body style="background-color: #f7e5c1;">
+  <div class="container mt-5" style="text-align: center;">
+    <div class="row">
+      <div class="position-relative text-center" style="display: inline-block;">
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2"
+          style="display: block; margin-left: auto; margin-right: auto;">
       </div>
     </div>
 
+    <div class="row">
+      <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
+        <form onsubmit="loginUser(event)">
+          <div class="mb-3">
+            <input type="email" class="form-control" id="email" placeholder="Email" required />
+          </div>
+          <div class="mb-3">
+            <input type="password" class="form-control" id="password" placeholder="Password" required />
+          </div>
+          <div class="mb-4">
+            <input type="submit" class="btn btn-calculate" value="Login" />
+          </div>
+        </form>
 
-    <script>
-      const btn = document.querySelector('.btn-calculate');
-      let timer1, timer2;
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+      </div>
+    </div>
+  </div>
 
-      btn.addEventListener('mouseenter', () => {
-        btn.classList.remove('shake-medium', 'shake-hard');
-        btn.classList.add('shake-light');
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
 
-        timer1 = setTimeout(() => {
-          btn.classList.remove('shake-light');
-          btn.classList.add('shake-medium');
-        }, 1000);
+  <script>
+    // 🔧 Replace this with your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDbRijonFCzWc5xWyWqPl8YAhZfYfIl0iU",
+      authDomain: "dat257-a9920.firebaseapp.com",
+      projectId: "dat257-a9920",
+      storageBucket: "dat257-a9920.firebasestorage.app",
+      messagingSenderId: "473370606734",
+      appId: "1:473370606734:web:a54530028d7e8b8f845ddf",
+      measurementId: "G-WB4E47RGFX"
+    };
 
-        timer2 = setTimeout(() => {
-          btn.classList.remove('shake-medium');
-          btn.classList.add('shake-hard');
-        }, 2500);
-      });
+    firebase.initializeApp(firebaseConfig);
 
-      btn.addEventListener('mouseleave', () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        btn.classList.remove('shake-light', 'shake-medium', 'shake-hard');
-      });
+    function loginUser(e) {
+      e.preventDefault();
 
-      
-    </script>
-  </body>
-  {% endblock %}
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(userCredential => userCredential.user.getIdToken())
+        .then(idToken => {
+          return fetch('/session-login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ idToken })
+          });
+        })
+        .then(response => {
+          if (response.ok) {
+            window.location.href = "/profile";
+          } else {
+            alert("Login failed. Please try again.");
+          }
+        })
+        .catch(error => {
+          alert("Login error: " + error.message);
+        });
+    }
+  </script>
+</body>
+{% endblock %}
