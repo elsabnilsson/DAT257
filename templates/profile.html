@@ -280,6 +280,11 @@
                   <strong>Water: </strong> {{ water_intake }} liter/day
                 </div>
               {% endif %}
+              {% if body_age %}
+                <div>
+                  <strong>Body Age: </strong> {{ body_age }} years
+                </div>
+              {% endif %}
             </div>
 
             {% if protein and fat and carbs %}

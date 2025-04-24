@@ -10,6 +10,7 @@ from firebase_admin import auth
 from firebase_config import *
 from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
+from body_age import BodyAge
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
@@ -63,7 +64,9 @@ def set_password():
             # Create user in Firebase Authentication
             user = auth.create_user(email=email, password=password)
 
-            # Save complete user profile in Firestore
+            session["user_uid"] = user.uid  #
+
+          
             user_ref = db.collection("users").document(user.uid)
             user_ref.set({
                 "email": email,
@@ -74,7 +77,9 @@ def set_password():
                 "gender": gender,
             })
 
-            return redirect(url_for("login"))
+            return redirect(url_for("profile"))
+
+
 
         except Exception as e:
             return f"Error registering user: {e}"
@@ -150,6 +155,7 @@ def profile():
 
     person = Person(age, height, weight, gender)
     bmi = person.calculate_bmi()
+    body_age = BodyAge().calculate(person)
 
     strategy_map = {
         "inactive": InactiveNutrition(),
@@ -164,6 +170,8 @@ def profile():
     session["rec_carbs"] = carbs
     water_intake = calc_water_intake(person, activity)
     meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
+    person = Person(age, height, weight, gender)
+    bmi = person.calculate_bmi()
 
     return render_template(
         "profile.html",
@@ -179,8 +187,8 @@ def profile():
         gender=gender,
         water_intake=water_intake,
         meal_plan=meal_plan,
-        weight_log=weight_log
-    )
+        weight_log=weight_log,
+        body_age=body_age)
 
 
 
@@ -239,6 +247,7 @@ def index():
         water_intake=water_intake,
         gender=gender,
         meal_plan=meal_plan 
+        
     )
 
 @app.route("/stats")
