@@ -6,6 +6,17 @@
 
     <form method="get" class="mb-4">
       <div class="mb-2">
+        <div class="mb-2">
+          <label for="meal" class="form-label">Choose meal:</label>
+          <select name="meal" id="meal" class="form-select w-auto d-inline-block">
+            {% for m in ["Breakfast","Lunch","Dinner","Snack"] %}
+              <option value="{{ m }}"
+                {% if request.args.get("meal", "Breakfast") == m %}selected{% endif %}>
+                {{ m }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
         <input
           type="checkbox"
           id="vegetarian"

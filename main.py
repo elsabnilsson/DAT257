@@ -37,9 +37,11 @@ def index():
 
             strategy = strategy_map.get(activity, ActiveNutrition())
             calories, protein, fat, carbs = strategy.calculate_macros(person)
+            meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
             session["rec_calories"] = calories
             session["rec_protein"]  = protein
             session["rec_carbs"]    = carbs
+            session["meal_plan"]    = meal_plan
             water_intake = calc_water_intake(person, activity)
             meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
 
@@ -82,17 +84,15 @@ def recipes():
     if not intolerances:
         intolerances = None
 
-    rec_cal  = session.get("rec_calories")
-    rec_prot = session.get("rec_protein")
-    rec_carb = session.get("rec_carbs")
+    meal = request.args.get("meal", "Breakfast")
+    meal_plan = session.get("meal_plan", {})
 
-    if rec_cal and rec_prot and rec_carb:
-        min_cal = int(rec_cal * 0.1)
-        max_cal = int(rec_cal * 7)
-        min_prot = int(rec_prot * 0.1)
-        max_prot = int(rec_prot * 7)
-        min_carb = int(rec_carb * 0.1)
-        max_carb = int(rec_carb * 7)
+    if meal_plan and meal in meal_plan:
+        rec = meal_plan[meal]
+        rec_cal, rec_prot, rec_carb = rec["calories"], rec["protein"], rec["carbs"]
+        min_cal = int(rec_cal * 0.9); max_cal = int(rec_cal * 1.1)
+        min_prot = int(rec_prot * 0.1); max_prot = int(rec_prot * 7)
+        min_carb = int(rec_carb * 0.1); max_carb = int(rec_carb * 7)
     else:
         min_cal = max_cal = min_prot = max_prot = min_carb = max_carb = None
 
@@ -110,7 +110,12 @@ def recipes():
         min_carbs=min_carb,
         max_carbs=max_carb,
     )
-    return render_template("recipes.html", recipes=recipes_data, query=query)
+    return render_template(
+        "recipes.html",
+        recipes=recipes_data,
+        query=query,
+        meal=meal
+    )
 
 @app.route("/workouts")
 def workouts():
