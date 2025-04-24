@@ -5,6 +5,35 @@
     <h1>Search Recipes</h1>
 
     <form method="get" class="mb-4">
+      <div class="mb-2">
+        <input
+          type="checkbox"
+          id="vegetarian"
+          name="vegetarian"
+          class="form-check-input"
+          {% if request.args.get('vegetarian') %}checked{% endif %}
+        >
+        <label for="vegetarian" class="form-check-label">Vegetarian</label>
+    
+        <input
+          type="checkbox"
+          id="lactose"
+          name="lactose"
+          class="form-check-input ms-3"
+          {% if request.args.get('lactose') %}checked{% endif %}
+        >
+        <label for="lactose" class="form-check-label">Lactose intolerant</label>
+    
+        <input
+          type="checkbox"
+          id="gluten"
+          name="gluten"
+          class="form-check-input ms-3"
+          {% if request.args.get('gluten') %}checked{% endif %}
+        >
+        <label for="gluten" class="form-check-label">Gluten intolerant</label>
+      </div>
+    
       <div class="input-group">
         <input
           type="text"

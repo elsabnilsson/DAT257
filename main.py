@@ -71,6 +71,17 @@ def recipes():
 
     query = request.args.get("query", "side salad")
 
+    diet = "vegetarian" if request.args.get("vegetarian") else None
+
+
+    intolerances = []
+    if request.args.get("lactose"):
+        intolerances.append("lactose")
+    if request.args.get("gluten"):
+        intolerances.append("gluten")
+    if not intolerances:
+        intolerances = None
+
     rec_cal  = session.get("rec_calories")
     rec_prot = session.get("rec_protein")
     rec_carb = session.get("rec_carbs")
@@ -87,6 +98,8 @@ def recipes():
 
     recipes_data = get_recipes(
         query=query,
+        diet=diet,
+        intolerances=intolerances,
         add_recipe_information=True,
         add_recipe_instructions=True,
         add_recipe_nutrition=True,
