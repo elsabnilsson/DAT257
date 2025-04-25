@@ -87,6 +87,7 @@ def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
+    
 
         try:
             # Sign in the user
@@ -180,7 +181,7 @@ def profile():
     )
 
 
-
+"""
 @app.route("/main", methods=["GET", "POST"])
 def index():
     age = height = weight = activity = gender = ""
@@ -233,6 +234,8 @@ def index():
         gender=gender,
         meal_plan=meal_plan 
     )
+    
+"""
 
 @app.route("/stats")
 def stats():
@@ -275,7 +278,10 @@ def recipes():
 def workouts():
     return render_template("workouts.html")
 
-
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(debug=True)
