@@ -1,9 +1,8 @@
 from activitylevel import InactiveNutrition, ModerateNutrition, ActiveNutrition
 from person import Person
 from rec_water import calc_water_intake
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session, url_for
 from recipes_api import get_recipes
-from flask import session
 import os
 from flask import redirect, url_for
 from firebase_admin import auth
@@ -199,6 +198,12 @@ def index():
             height = float(height_input) / 100
             weight = float(weight_input)
 
+            session["age"] = age
+            session["height"] = height
+            session["weight"] = weight
+            session["activity"] = activity
+            session["gender"] = gender
+
             person = Person(age, height, weight, gender)
             bmi = person.calculate_bmi()
 
@@ -216,8 +221,21 @@ def index():
             water_intake = calc_water_intake(person, activity)
             meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
             
+            session["bmi"] = bmi
+            session["rec_fat"] = fat
+            session["water_intake"] = water_intake
+            session["meal_plan"] = meal_plan  
+
+            return redirect(url_for("stats"))
+
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
+            
+    age = session.get("age", age)
+    height = session.get("height", height)
+    weight = session.get("weight", weight)
+    activity = session.get("activity", activity)
+    gender = session.get("gender", gender)
 
     return render_template(
         "index.html",
@@ -239,7 +257,17 @@ def index():
 
 @app.route("/stats")
 def stats():
-    return render_template("stats.html")
+    return render_template(
+        "stats.html",
+        bmi=session.get("bmi"),
+        calories=session.get("rec_calories"),
+        protein=session.get("rec_protein"),
+        fat=session.get("rec_fat"),
+        carbs=session.get("rec_carbs"),
+        water_intake=session.get("water_intake"),
+        meal_plan=session.get("meal_plan")
+    )
+
 
 @app.route("/recipes")
 def recipes():
