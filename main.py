@@ -175,7 +175,7 @@ def profile():
     session["rec_fat"] = fat
     session["water_intake"] = water_intake
     session["meal_plan"] = meal_plan  
-
+    session["weight_log"] = weight_log
 
     return render_template(
         "index.html",
@@ -282,7 +282,8 @@ def stats():
         fat=session.get("rec_fat"),
         carbs=session.get("rec_carbs"),
         water_intake=session.get("water_intake"),
-        meal_plan=session.get("meal_plan")
+        meal_plan=session.get("meal_plan"),
+        weight_log=session.get("weight_log", []),
     )
 
 
