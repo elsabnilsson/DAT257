@@ -1,8 +1,157 @@
 {% extends "base.html" %}
 {% block title %}About{% endblock %}
 {% block content %}
-  <div class="container mt-5 text-center">
-    <h1>stats</h1>
-    <p>stats page</p>
+
+<style>
+  .tooltip-asterisk {
+    display: inline-block;
+    position: relative;
+    color: #888;
+    cursor: help;
+    margin-left: 4px;
+  }
+
+  .tooltip-asterisk:hover + .tooltip-text {
+    display: inline-block;
+  }
+
+  .tooltip-text {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 5px;
+    top: -5px;
+    left: 20px;
+    z-index: 1000;
+    font-size: 0.85rem;
+    white-space: normal;     
+    max-width: 250px;        
+    text-align: left;        
+  }
+</style>
+
+<body style="background-color: #f7e5c1;">
+  <div class="container mt-5" style="text-align: center;">
+    <div class="position-relative text-center" style="display: inline-block;">
+
+      {% if bmi is not none %}
+        <div class="alert alert-success">
+          <div style="padding-bottom: 0%; font-size: 16pt;">
+            <strong>Your BMI: </strong> {{ bmi }}
+            <span class="tooltip-asterisk">*</span>
+            <span class="tooltip-text">BMI is an approximate estimate of your fysical fitness. Note that individual condidtions may affect the accuracy of this estimate. BMI alone should not be used to estimate how healthy a person is.</span>
+          </div>
+
+          {% include "bmi_visual.html" %}
+          
+          <hr width="100%" size="2">
+          <div style="padding-bottom: 2%; font-size: 16pt;">
+            <strong>RECOMENDED DAILY </strong>
+          </div>
+
+          {% if calories %}
+            <div>
+              <strong>Calories: </strong> {{ calories }} kcal
+            </div>
+          {% endif %}
+
+          {% if protein is not none %}
+            <div>
+              <strong>Protein: </strong> {{ protein }} grams/day
+            </div>
+          {% endif %}
+
+          {% if fat %}
+            <div>
+              <strong>Fat: </strong> {{ fat }} grams/day
+            </div>
+          {% endif %}
+
+          {% if carbs %}
+            <div>
+              <strong>Carbs: </strong> {{ carbs }} grams/day
+            </div>
+          {% endif %}
+
+          {% if water_intake %}
+            <div>
+              <strong>Water: </strong> {{ water_intake }} liter/day
+            </div>
+          {% endif %}
+        </div>
+
+        {% if protein and fat and carbs %}
+          <div class="mt-5" style="max-width: 500px; margin: auto;">
+            <h5 class="text-center">Macronutrient Distribution</h5>
+            <canvas id="macroChart"></canvas>
+          </div>
+
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+          <script>
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            const macroChart = new Chart(ctx, {
+              type: 'pie',
+              data: {
+                labels: ['Protein', 'Fat', 'Carbs'],
+                datasets: [{
+                  data: [{{ protein }}, {{ fat }}, {{ carbs }}],
+                  backgroundColor: ['#4caf50', '#ff9800', '#2196f3'],
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'bottom'
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        let value = context.raw;
+                        return `${context.label}: ${value}g`;
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          </script>
+        {% endif %}
+      {% endif %}
+
+      {% if meal_plan %}
+        <div class="alert alert-success">
+          <div style="padding-bottom: 0%; font-size: 16pt;">
+            <h2>Suggested Meal Split</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Meal</th>
+                  <th>Calories</th>
+                  <th>Protein (g)</th>
+                  <th>Fat (g)</th>
+                  <th>Carbs (g)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for meal, macros in meal_plan.items() %}
+                  <tr>
+                    <td>{{ meal }}</td>
+                    <td>{{ macros.calories }}</td>
+                    <td>{{ macros.protein }}</td>
+                    <td>{{ macros.fat }}</td>
+                    <td>{{ macros.carbs }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
   </div>
 {% endblock %}

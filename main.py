@@ -1,9 +1,8 @@
 from activitylevel import InactiveNutrition, ModerateNutrition, ActiveNutrition
 from person import Person
 from rec_water import calc_water_intake
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, session, url_for
 from recipes_api import get_recipes
-from flask import session
 import os
 
 app = Flask(__name__)
@@ -49,6 +48,13 @@ def index():
             water_intake = calc_water_intake(person, activity)
             meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
 
+            session["bmi"] = bmi
+            session["rec_fat"] = fat
+            session["water_intake"] = water_intake
+            session["meal_plan"] = meal_plan  
+
+            return redirect(url_for("stats"))
+
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
             
@@ -76,7 +82,17 @@ def index():
 
 @app.route("/stats")
 def stats():
-    return render_template("stats.html")
+    return render_template(
+        "stats.html",
+        bmi=session.get("bmi"),
+        calories=session.get("rec_calories"),
+        protein=session.get("rec_protein"),
+        fat=session.get("rec_fat"),
+        carbs=session.get("rec_carbs"),
+        water_intake=session.get("water_intake"),
+        meal_plan=session.get("meal_plan")
+    )
+
 
 @app.route("/recipes")
 def recipes():
