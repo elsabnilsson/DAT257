@@ -117,6 +117,7 @@ def profile():
             weight = float(request.form.get("weight", ""))
             activity = request.form.get("activity", "active")
     
+    
 
             # Update Firestore with new values
             user_ref.update({
@@ -127,9 +128,17 @@ def profile():
                     "timestamp": datetime.utcnow().isoformat()
     }])
             })
+            
+        
+            session["weight"] = weight
+            session["activity"] = activity
+            
+            
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
+        return redirect(url_for("stats"))
+    
     user_data = user_ref.get()
     if not user_data.exists:
         return "User profile not found", 404
@@ -161,9 +170,15 @@ def profile():
     session["rec_carbs"] = carbs
     water_intake = calc_water_intake(person, activity)
     meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
+    
+    session["bmi"] = bmi
+    session["rec_fat"] = fat
+    session["water_intake"] = water_intake
+    session["meal_plan"] = meal_plan  
+
 
     return render_template(
-        "profile.html",
+        "index.html",
         bmi=bmi,
         protein=protein,
         calories=calories,
@@ -181,7 +196,7 @@ def profile():
 
 
 """
-@app.route("/main", methods=["GET", "POST"])
+@app.route("/profile", methods=["GET", "POST"])
 def index():
     age = height = weight = activity = gender = ""
     bmi = protein = calories = fat = carbs = water_intake = meal_plan = None
