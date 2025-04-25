@@ -9,6 +9,7 @@ from firebase_admin import auth
 from firebase_config import db
 from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
+from google.cloud import firestore
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
@@ -119,14 +120,28 @@ def profile():
     
     
 
-            # Update Firestore with new values
+            # Fetch the existing weight log
+            user_doc = user_ref.get()
+            user_data = user_doc.to_dict()
+            weight_log = user_data.get("weight_log", [])
+
+            # Get today's date as string (YYYY-MM-DD)
+            today_str = datetime.utcnow().date().isoformat()
+
+            # Remove any existing entry for today
+            updated_log = [entry for entry in weight_log if not entry["timestamp"].startswith(today_str)]
+
+            # Add the new entry for today
+            updated_log.append({
+                "weight": weight,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+
+            # Update Firestore with the new weight, activity, and cleaned log
             user_ref.update({
                 "weight": weight,
                 "activity": activity,
-                "weight_log": ArrayUnion([{
-                    "weight": weight,
-                    "timestamp": datetime.utcnow().isoformat()
-    }])
+                "weight_log": updated_log
             })
             
         
@@ -194,83 +209,6 @@ def profile():
         weight_log=weight_log
     )
 
-
-"""
-@app.route("/profile", methods=["GET", "POST"])
-def index():
-    age = height = weight = activity = gender = ""
-    bmi = protein = calories = fat = carbs = water_intake = meal_plan = None
-
-    if request.method == "POST":
-        age_input = request.form.get("age", "")
-        height_input = request.form.get("height", "")
-        weight_input = request.form.get("weight", "")
-        activity = request.form.get("activity", "active")
-        gender = request.form.get("gender", "other")
-
-        try:
-            age = int(age_input)
-            height = float(height_input) / 100
-            weight = float(weight_input)
-
-            session["age"] = age
-            session["height"] = height
-            session["weight"] = weight
-            session["activity"] = activity
-            session["gender"] = gender
-
-            person = Person(age, height, weight, gender)
-            bmi = person.calculate_bmi()
-
-            strategy_map = {
-                "inactive": InactiveNutrition(),
-                "moderate": ModerateNutrition(),
-                "active": ActiveNutrition()
-            }
-
-            strategy = strategy_map.get(activity, ActiveNutrition())
-            calories, protein, fat, carbs = strategy.calculate_macros(person)
-            meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
-            session["rec_calories"] = calories
-            session["rec_protein"]  = protein
-            session["rec_carbs"]    = carbs
-            session["meal_plan"]    = meal_plan
-            water_intake = calc_water_intake(person, activity)
-            meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
-            
-            session["bmi"] = bmi
-            session["rec_fat"] = fat
-            session["water_intake"] = water_intake
-            session["meal_plan"] = meal_plan  
-
-            return redirect(url_for("stats"))
-
-        except ValueError:
-            bmi = "Invalid input. Please enter valid numbers."
-            
-    age = session.get("age", age)
-    height = session.get("height", height)
-    weight = session.get("weight", weight)
-    activity = session.get("activity", activity)
-    gender = session.get("gender", gender)
-
-    return render_template(
-        "index.html",
-        bmi=bmi,
-        protein=protein,
-        calories=calories,
-        fat=fat,
-        carbs=carbs,
-        age=age,    
-        height=height * 100 if height else "",
-        weight=weight if weight else "",
-        activity=activity,
-        water_intake=water_intake,
-        gender=gender,
-        meal_plan=meal_plan 
-    )
-    
-"""
 
 @app.route("/stats")
 def stats():
