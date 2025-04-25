@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+      .btn-check:checked + .btn,
+      .btn-check:focus + .btn {
+        border-color: #433118;
+        background-color: #433118;
+        color: white;
+      }
+      .btn-check:not(:checked) + .btn {
+        border-color: #bbb;
+        color: #433118;
+      }
+      .btn-check:not(:checked) + .btn:hover {
+        border-color: #433118;
+        color: #433118;
+        background-color: rgba(67, 49, 24, 0.05);
+      }
+
+      .btn-calculate {
+        border-color: #433118;
+        background-color: #433118;
+        color: white;
+        transition: transform 0.2s ease, box-shadow 0.3s ease;
+      }
+
+      @keyframes shake-light {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.05); }
+        75% { transform: scale(0.95); }
+      }
+
+      @keyframes shake-medium {
+        0%, 100% { transform: scale(1); }
+        20% { transform: scale(1.1); }
+        80% { transform: scale(0.9); }
+      }
+
+      @keyframes shake-hard {
+        0%, 100% { transform: scale(1); }
+        15% { transform: scale(1.2); }
+        85% { transform: scale(0.8); }
+      }
+
+      .shake-light:hover {
+        animation: shake-light 0.3s infinite;
+        background-color: #5D7A3A;
+        border-color: #5D7A3A;
+        color: white;
+      }
+
+      .shake-medium:hover {
+        animation: shake-medium 0.2s infinite;
+        background-color: #5D7A3A;
+        border-color: #5D7A3A;
+        color: white;
+      }
+
+      .shake-hard:hover {
+        animation: shake-hard 0.15s infinite;
+        background-color: #5D7A3A;
+        border-color: #5D7A3A;
+        color: white;
+      }
+
+      .btn-calculate:active {
+        transform: scale(0.95);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        background-color: white;
+        color: #433118;
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-label-right {
+        position: absolute;
+        right: 34px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+        font-size: 0.9rem;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        opacity: 0;
+      }
+
+      .tooltip-asterisk {
+        display: inline-block;
+        position: relative;
+        color: #888;
+        cursor: help;
+        margin-left: 4px;
+      }
+
+      .tooltip-asterisk:hover + .tooltip-text {
+        display: inline-block;
+      }
+
+      .tooltip-text {
+        display: none;
+        position: absolute;
+        background-color: #333;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 5px;
+        top: -5px;
+        left: 20px;
+        z-index: 1000;
+        font-size: 0.85rem;
+        white-space: normal;     
+        max-width: 250px;        
+        text-align: left;        
+      }
+
+    </style>
+
+  <body style="background-color: #f7e5c1;">
+    <div class="container mt-5" style="text-align: center;">
+      <div class="row">
+        <div class="position-relative text-center" style="display: inline-block;">
+          <div id="messageOverlay" style="
+            position: absolute;
+            top: 0px;
+            left: 48.5%;
+            transform: translateX(-50%) rotate(-10deg);
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            z-index: 10;
+            white-space: nowrap;
+            text-align: center;
+          "></div>
+
+          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
+          <form method="post">
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+              <input
+                type="number"
+                class="form-control"
+                name="age"
+                id="age"
+                value="{{ age }}"
+                placeholder="Age"
+                required
+                min="18"
+                max="100"
+                oninput="toggleLabel(this)"
+              />
+              <span class="input-label-right" id="label-age">Age</span>
+            </div>
+
+            <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+              
+              <select class="form-select" name="gender" id="gender" required>
+                <option value="">Gender</option>
+                <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
+                <option value="female" {% if gender == "female" %}selected{% endif %}>Female</option>
+                <option value="other" {% if gender == "other" %}selected{% endif %}>Other</option>
+              </select>
+            </div>
+
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+              <input
+                type="number"
+                class="form-control"
+                name="height"
+                id="height"
+                value="{{ height }}"
+                placeholder="Height (cm)"
+                required
+                step="0.1"
+                min="120"
+                max="250"
+                oninput="toggleLabel(this)"
+              />
+              <span class="input-label-right" id="label-height">Height (cm)</span>
+            </div>
+
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+              <input
+                type="number"
+                class="form-control"
+                name="weight"
+                id="weight"
+                value="{{ weight }}"
+                placeholder="Weight (kg)"
+                required
+                step="0.1"
+                min="30"
+                max="300"
+              />
+              <span class="input-label-right" id="label-weight">Weight (kg)</span>
+            </div>
+
+            <div class="mb-4" style="padding-bottom: 6%;">
+              <div class="h5">
+                <label class="form-label d-block mb-1">Activity Level</label>
+                {% set explanations = {
+                  'inactive': 'Sedentary: little or no exercise (factor 1.2)',
+                  'moderate': 'Lightly active: moderate exercise or daily activity (factor 1.45)',
+                  'active': 'Active: intensive exercise or physically demanding activity (factor 1.7)'
+                } %}
+                
+                <div class="btn-group w-100" role="group" aria-label="Activity level buttons">
+                  {% for level in ['inactive', 'moderate', 'active'] %}
+                    <input 
+                      type="radio" 
+                      class="btn-check" 
+                      name="activity" 
+                      id="activity-{{ level }}" 
+                      value="{{ level }}"
+                      {% if activity == level %}checked{% endif %}
+                      required
+                      autocomplete="off"
+                    >
+                    <label 
+                      class="btn btn-outline-primary text-capitalize" 
+                      for="activity-{{ level }}"
+                      title="{{ explanations[level] }}"
+                    >
+                      {{ level }}
+                    </label>
+                  {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+              <input type="submit" class="btn btn-calculate w-100 shake-light" value="Register to see results" />
+            </div>
+          </form>
+
+        </div>
+
+
+    </div>
+  </div>
+
+          
+
+
+    <script>
+      const btn = document.querySelector('.btn-calculate');
+      let timer1, timer2;
+
+      btn.addEventListener('mouseenter', () => {
+        btn.classList.remove('shake-medium', 'shake-hard');
+        btn.classList.add('shake-light');
+
+        timer1 = setTimeout(() => {
+          btn.classList.remove('shake-light');
+          btn.classList.add('shake-medium');
+        }, 1000);
+
+        timer2 = setTimeout(() => {
+          btn.classList.remove('shake-medium');
+          btn.classList.add('shake-hard');
+        }, 2500);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        btn.classList.remove('shake-light', 'shake-medium', 'shake-hard');
+      });
+
+    
+    </script>
+  </body>
+{% endblock %}
