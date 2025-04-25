@@ -75,7 +75,9 @@ def set_password():
                 "gender": gender,
             })
 
-            return redirect(url_for("login"))
+            session["user_uid"] = user.uid  # <- This line makes them "logged in"
+
+            return redirect(url_for("profile"))
 
         except Exception as e:
             return f"Error registering user: {e}"
@@ -290,7 +292,7 @@ def stats():
         carbs=session.get("rec_carbs"),
         water_intake=session.get("water_intake"),
         meal_plan=session.get("meal_plan"),
-        body_age=session.get("body_age")
+        body_age=session.get("body_age"),
         weight_log=session.get("weight_log", []),
     )
 
