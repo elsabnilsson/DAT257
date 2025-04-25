@@ -10,6 +10,13 @@ from firebase_config import db
 from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
 from google.cloud import firestore
+import requests
+from flask import Flask, request, session, redirect, url_for, render_template
+from flask import Flask, render_template, request, redirect, url_for, flash
+import requests
+from firebase_admin.auth import EmailAlreadyExistsError
+
+FIREBASE_API_KEY = "AIzaSyCrlsFF_qHY40TczFJ6jmZEmcKcHY__fmg"
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
@@ -45,10 +52,11 @@ def register():
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
-    return render_template("register.html", age=age, height=height, weight=weight, activity=activity, gender=gender)
+    return render_template("register.html", current_route=request.endpoint, age=age, height=height, weight=weight, activity=activity, gender=gender)
 
 @app.route("/set_password", methods=["GET", "POST"])
 def set_password():
+    error = None
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -77,30 +85,43 @@ def set_password():
 
             return redirect(url_for("login"))
 
-        except Exception as e:
-            return f"Error registering user: {e}"
+        except EmailAlreadyExistsError:
+            error = "A user with this email already exists."
+        except requests.exceptions.RequestException as e:
+            # Handle other request exceptions
+            error = f"An error occurred: {str(e)}"
 
-    return render_template("set_password.html")
+    return render_template("set_password.html", error=error, current_route=request.endpoint)
 
 @app.route("/", methods=["GET", "POST"])
 def login():
+    error = None
+
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-    
+
+        payload = {
+            "email": email,
+            "password": password,
+            "returnSecureToken": True
+        }
 
         try:
-            # Sign in the user
-            user = auth.get_user_by_email(email)
-            # Check the password manually (you can also use Firebase Auth SDK on the client-side)
-            # For simplicity, we are assuming the password is correct here
-            session["user_uid"] = user.uid
-            return redirect(url_for("profile"))
+            r = requests.post(
+                f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}",
+                json=payload
+            )
+            r.raise_for_status()
+            data = r.json()
+            session["user_uid"] = data["localId"]
+            
+            return redirect(url_for("stats"))
 
-        except Exception as e:
-            return f"Login failed: {e}"
+        except requests.exceptions.RequestException:
+            error = "Wrong email or password."
 
-    return render_template("login.html")
+    return render_template("login.html", error=error, current_route=request.endpoint)
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -282,6 +303,32 @@ def workouts():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    if request.method == "POST":
+        email = request.form["email"]
+
+        payload = {
+            "requestType": "PASSWORD_RESET",
+            "email": email
+        }
+
+        try:
+            response = requests.post(
+                f"https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={FIREBASE_API_KEY}",
+                json=payload
+            )
+            response.raise_for_status()
+            flash("Password reset link sent! Please check your email.", "success")
+        except requests.exceptions.RequestException:
+            flash("Error sending reset link. Make sure the email is correct.", "error")
+
+        return redirect(url_for("login"))
+
+    return render_template("change_password.html", current_route=request.endpoint)
+    
+
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -270,6 +270,15 @@
         btn.classList.remove('shake-light', 'shake-medium', 'shake-hard');
       });
 
+      function toggleLabel(input) {
+        const label = document.getElementById("label-" + input.name);
+        if (input.value.trim()) {
+          label.style.opacity = 1;
+        } else {
+          label.style.opacity = 0;
+        }
+      }
+
     
     </script>
   </body>
