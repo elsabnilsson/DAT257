@@ -11,7 +11,6 @@ from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
 from body_age import BodyAge
 from workouts import search_exercises_by_body_part, filter_exercises
-from workouts_api import search_exercises_by_body_part, filter_exercises
 
 
 
@@ -377,29 +376,7 @@ def workouts():
             exercises = [{"name": f"Error fetching exercises: {str(e)}"}]
 
     return render_template("workouts.html", exercises=exercises, body_part=body_part)
-    body_part = request.args.get("body_part", "")
-    exercises = []
-
-    user_uid = session.get("user_uid")
-    if not user_uid:
-        return redirect(url_for("login"))
-
-    user_ref = db.collection("users").document(user_uid).get()
-    if not user_ref.exists:
-        return "User not found", 404
-
-    user = user_ref.to_dict()
-    person = Person(user["age"], user["height"], user["weight"], user["gender"])
-
-    if body_part:
-        try:
-            raw = search_exercises_by_body_part(body_part)
-            exercises = filter_exercises(raw, person, user["activity"])
-        except Exception as e:
-            exercises = [{"name": f"Error fetching exercises: {str(e)}"}]
-
-    return render_template("workouts.html", exercises=exercises, body_part=body_part)
-
+    
 
 
 
