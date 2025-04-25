@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}About{% endblock %}
+{% block title %} Stats {% endblock %}
 {% block content %}
 
 <style>
@@ -37,7 +37,7 @@
     <div class="position-relative text-center" style="display: inline-block;">
 
       {% if bmi is not none %}
-        <div class="alert alert-success">
+        <div class="alert alert-success" style="width: 450px; margin: 0 auto; text-align: center;">
           <div style="padding-bottom: 0%; font-size: 16pt;">
             <strong>Your BMI: </strong> {{ bmi }}
             <span class="tooltip-asterisk">*</span>
@@ -45,8 +45,9 @@
           </div>
 
           {% include "bmi_visual.html" %}
-          
-          <hr width="100%" size="2">
+        </div>
+
+        <div class="alert alert-success mt-4" style="width: 450px; margin: 0 auto; text-align: center;">
           <div style="padding-bottom: 2%; font-size: 16pt;">
             <strong>RECOMENDED DAILY </strong>
           </div>
@@ -80,6 +81,20 @@
               <strong>Water: </strong> {{ water_intake }} liter/day
             </div>
           {% endif %}
+
+          <div class="mt-3">
+            <h6 style="font-size: 0.8em;">That's about this many glasses of water:</h6>
+            {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
+            <div 
+              style="display: flex; flex-wrap: wrap; justify-content: left; width: 100%; margin-top: -3px; margin-bottom: -5px;"
+              title="Each glass represents 0.25 liters of water — Total: {{ glasses_count }} glasses">
+              {% for i in range(glasses_count) %}
+                <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
+                  <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 60px; height: 55px;">
+                </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
 
         {% if protein and fat and carbs %}
