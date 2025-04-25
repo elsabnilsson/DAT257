@@ -1,52 +1,100 @@
 {% extends "base.html" %}
 {% block title %}Recipes{% endblock %}
 {% block content %}
-  <div class="container mt-5">
-    <h1>Search Recipes</h1>
+  <div class="container mt-5 row">
+    <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto; text-align: center;">
+      <h1>Search Recipes</h1>
 
-    <form method="get" class="mb-4">
-      <div class="input-group">
-        <input
-          type="text"
-          name="query"
-          class="form-control"
-          placeholder="e.g. side salad"
-          value="{{ query }}"
-          required
-        >
-        <button class="btn btn-primary" type="submit">Search</button>
-      </div>
-    </form>
-
-    {% if recipes and recipes.results %}
-      <div class="row">
-        {% for r in recipes.results %}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <img src="{{ r.image }}" class="card-img-top" alt="{{ r.title }}">
-              <div class="card-body">
-                <h5 class="card-title">{{ r.title }}</h5>
-                <p class="card-text">
-                  Ready in {{ r.readyInMinutes }} min<br>
-                  Calories: {{ r.nutrition.nutrients
-                    | selectattr("name", "equalto", "Calories")
-                    | map(attribute="amount")
-                    | first }} kcal
-                </p>
-                <a
-                  href="https://spoonacular.com/recipes/{{ r.id }}"
-                  target="_blank"
-                  class="btn btn-sm btn-outline-secondary"
-                >
-                  View
-                </a>
-              </div>
+      <form method="get" class="mb-4">
+        <div class="mb-2 row">
+          <div class="col-md-8">
+            <div class="row">
+              <input
+                type="checkbox"
+                id="vegetarian"
+                name="vegetarian"
+                class="form-check-input ms-3 col-md-1"
+                {% if request.args.get('vegetarian') %}checked{% endif %}
+              >
+              <label for="vegetarian" class="form-check-label col">Vegetarian</label>
+            </div>
+            <div class="row">
+              <input
+                type="checkbox"
+                id="lactose"
+                name="lactose"
+                class="form-check-input ms-3 col-md-1"
+                {% if request.args.get('lactose') %}checked{% endif %}
+              >
+              <label for="lactose" class="form-check-label col">Lactose intolerant</label>
+            </div>
+            <div class="row">
+              <input
+                type="checkbox"
+                id="gluten"
+                name="gluten"
+                class="form-check-input ms-3 col-md-1"
+                {% if request.args.get('gluten') %}checked{% endif %}
+              >
+              <label for="gluten" class="form-check-label col">Gluten intolerant</label>
             </div>
           </div>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p>No recipes found for “{{ query }}”.</p>
-    {% endif %}
+          <div class="mb-2 col-md-4">
+            <label for="meal" class="form-label">Choose meal:</label>
+            <select name="meal" id="meal" class="form-select w-auto d-inline-block">
+              {% for m in ["Breakfast","Lunch","Dinner","Snack"] %}
+                <option value="{{ m }}"
+                  {% if request.args.get("meal", "Breakfast") == m %}selected{% endif %}>
+                  {{ m }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      
+        <div class="input-group">
+          <input
+            type="text"
+            name="query"
+            class="form-control"
+            placeholder="e.g. side salad"
+            value="{{ query }}"
+            required
+          >
+          <button class="btn btn-primary" style="background-color: #433118; border-color:#433118;" type="submit">Search</button>
+        </div>
+      </form>
+
+      {% if recipes and recipes.results %}
+        <div class="row">
+          {% for r in recipes.results %}
+            <div class="col-md-12">
+              <div class="card h-100">
+                <img src="{{ r.image }}" class="card-img-top" alt="{{ r.title }}">
+                <div class="card-body">
+                  <h5 class="card-title">{{ r.title }}</h5>
+                  <p class="card-text">
+                    Ready in {{ r.readyInMinutes }} min<br>
+                    Calories: {{ r.nutrition.nutrients
+                      | selectattr("name", "equalto", "Calories")
+                      | map(attribute="amount")
+                      | first }} kcal
+                  </p>
+                  <a
+                    href="https://spoonacular.com/recipes/{{ r.id }}"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-secondary"
+                  >
+                    View
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No recipes found for “{{ query }}”.</p>
+      {% endif %}
+    </div>
   </div>
 {% endblock %}
