@@ -9,6 +9,7 @@ from firebase_admin import auth
 from firebase_config import db
 from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
+from body_age import BodyAge
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
@@ -156,6 +157,7 @@ def profile():
 
     person = Person(age, height, weight, gender)
     bmi = person.calculate_bmi()
+    body_age = BodyAge().calculate(person)
 
     strategy_map = {
         "inactive": InactiveNutrition(),
@@ -175,6 +177,7 @@ def profile():
     session["rec_fat"] = fat
     session["water_intake"] = water_intake
     session["meal_plan"] = meal_plan  
+    session["body_age"] = body_age
 
 
     return render_template(
@@ -191,8 +194,9 @@ def profile():
         gender=gender,
         water_intake=water_intake,
         meal_plan=meal_plan,
-        weight_log=weight_log
-    )
+        weight_log=weight_log,
+        body_age=body_age)
+    
 
 
 """
@@ -273,6 +277,8 @@ def index():
 """
 
 @app.route("/stats")
+
+
 def stats():
     return render_template(
         "stats.html",
@@ -282,7 +288,8 @@ def stats():
         fat=session.get("rec_fat"),
         carbs=session.get("rec_carbs"),
         water_intake=session.get("water_intake"),
-        meal_plan=session.get("meal_plan")
+        meal_plan=session.get("meal_plan"),
+        body_age=session.get("body_age")
     )
 
 
