@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Initialize Firebase with credentials
-cred = credentials.Certificate("DAT257/DAT257/firebase-adminsdk.json")
+cred = credentials.Certificate("C:/Users/hugod/OneDrive/Documents/DAT257/firebase-admin.json")
 firebase_admin.initialize_app(cred)
 
 # Get the Firestore client
