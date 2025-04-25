@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% block title %}BMI Calculator{% endblock %}
 {% block content %}
     <style>
       .btn-check:checked + .btn,
@@ -115,6 +114,15 @@
         text-align: left;        
       }
 
+      input[readonly], select[disabled] {
+  background-color: #f0f0f0;  /* Light gray background */
+  color: #888;  /* Darker gray text */
+  border-color: #ddd;  /* Light gray border */
+  pointer-events: none;  /* Disables interaction */
+}
+
+
+
     </style>
 
   <body style="background-color: #f7e5c1;">
@@ -150,16 +158,14 @@
                 value="{{ age }}"
                 placeholder="Age"
                 required
-                min="18"
-                max="100"
-                oninput="toggleLabel(this)"
+                readonly
               />
               <span class="input-label-right" id="label-age">Age</span>
             </div>
 
             <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
               
-              <select class="form-select" name="gender" id="gender" required>
+              <select class="form-select" name="gender" id="gender" required disabled>
                 <option value="">Gender</option>
                 <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
                 <option value="female" {% if gender == "female" %}selected{% endif %}>Female</option>
@@ -176,10 +182,7 @@
                 value="{{ height }}"
                 placeholder="Height (cm)"
                 required
-                step="0.1"
-                min="120"
-                max="250"
-                oninput="toggleLabel(this)"
+                readonly
               />
               <span class="input-label-right" id="label-height">Height (cm)</span>
             </div>

@@ -7,7 +7,7 @@ from flask import session
 import os
 from flask import redirect, url_for
 from firebase_admin import auth
-from firebase_config import *
+from firebase_config import db
 from datetime import datetime
 from google.cloud.firestore_v1 import ArrayUnion
 
@@ -18,6 +18,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
 def register():
    
     age = height = weight = activity = gender = ""
+
 
     if request.method == "POST":
         age_input = request.form.get("age", "")
@@ -112,19 +113,15 @@ def profile():
     if request.method == "POST":
         try:
             # Fetch updated values from form
-            age = int(request.form.get("age", ""))
-            height = float(request.form.get("height", "")) / 100
+           
             weight = float(request.form.get("weight", ""))
             activity = request.form.get("activity", "active")
-            gender = request.form.get("gender", "other")
+    
 
             # Update Firestore with new values
             user_ref.update({
-                "age": age,
-                "height": height,
                 "weight": weight,
                 "activity": activity,
-                "gender": gender,
                 "weight_log": ArrayUnion([{
                     "weight": weight,
                     "timestamp": datetime.utcnow().isoformat()
@@ -217,10 +214,6 @@ def index():
             session["rec_carbs"]    = carbs
             water_intake = calc_water_intake(person, activity)
             meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
-
-            # Save user data to Firebase
-            user_id = str(age) + str(height) + str(weight)  # Or use a proper unique ID
-            save_user_profile(user_id, age, height, weight, activity, gender)
             
         except ValueError:
             bmi = "Invalid input. Please enter valid numbers."
