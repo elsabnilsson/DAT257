@@ -3,7 +3,6 @@ import requests
 
 API_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com"
 BASE_URL = f"https://{API_HOST}/recipes/complexSearch"
-os.environ["SPOONACULAR_API_KEY"] = "b04eb2b5452e4b1b843d9cdf8a0ddcef"
 API_KEY = os.getenv("SPOONACULAR_API_KEY")
 if not API_KEY:
     raise RuntimeError("SPOONACULAR_API_KEY not set in env")
