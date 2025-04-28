@@ -23,6 +23,7 @@ from body_age import BodyAge
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
 
+
 def nocache(view):
     def no_cache(*args, **kwargs):
         response = make_response(view(*args, **kwargs))
@@ -131,6 +132,47 @@ def login():
             session["user_uid"] = data["localId"]
             session["user_email"] = email  
             
+            # Fetch user data from Firestore
+            user_ref = db.collection("users").document(data["localId"])
+            user_data = user_ref.get()
+
+            if user_data.exists:
+                user_info = user_data.to_dict()
+
+                # Set session variables for the stats page
+                session["age"] = user_info["age"]
+                session["height"] = user_info["height"]
+                session["weight"] = user_info["weight"]
+                session["activity"] = user_info["activity"]
+                session["gender"] = user_info["gender"]
+
+                weight_log = user_info.get("weight_log", [])
+                weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
+    
+                person = Person(session["age"], session["height"], session["weight"], session["gender"])
+                bmi = person.calculate_bmi()
+                body_age = BodyAge().calculate(person)
+
+                # Nutrition strategy
+                strategy_map = {
+                    "inactive": InactiveNutrition(),
+                    "moderate": ModerateNutrition(),
+                    "active": ActiveNutrition()
+                }
+                strategy = strategy_map.get(user_info["activity"], ActiveNutrition())
+                calories, protein, fat, carbs = strategy.calculate_macros(person)
+
+                # Update session with all calculated data
+                session["bmi"] = bmi
+                session["rec_calories"] = calories
+                session["rec_protein"] = protein
+                session["rec_fat"] = fat
+                session["rec_carbs"] = carbs
+                session["body_age"] = body_age
+                session["water_intake"] = calc_water_intake(person, user_info["activity"])
+                session["meal_plan"] = strategy.meal_spli(calories, protein, fat, carbs)
+                session["weight_log"] = weight_log
+
             return redirect(url_for("stats"))
 
         except requests.exceptions.RequestException:
@@ -151,11 +193,11 @@ def profile():
     if request.method == "POST":
         try:
             # Fetch updated values from form
-           
             weight = float(request.form.get("weight", ""))
             activity = request.form.get("activity", "active")
-    
-    
+            age = int(request.form.get("age", ""))
+            height = float(request.form.get("height", "")) / 100
+            gender = request.form.get("gender", "other")
 
             # Fetch the existing weight log
             user_doc = user_ref.get()
@@ -176,20 +218,54 @@ def profile():
 
             # Update Firestore with the new weight, activity, and cleaned log
             user_ref.update({
+                "age": age,
+                "height": height,
+                "gender": gender,
                 "weight": weight,
                 "activity": activity,
                 "weight_log": updated_log
+            
             })
-            
-        
-            session["weight"] = weight
-            session["activity"] = activity
-            
-            
+
+
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
         return redirect(url_for("stats"))
+
+    user_data = user_ref.get()
+    if not user_data.exists:
+        return "User profile not found", 404
+
+    user_info = user_data.to_dict()
+    age = user_info["age"]
+    height = user_info["height"]
+    weight = user_info["weight"]
+    activity = user_info["activity"]
+    gender = user_info["gender"]
+    
+
+    return render_template(
+        "index.html",
+        age=age,
+        height=height * 100,
+        weight=weight,
+        activity=activity,
+        gender=gender,
+
+)
+    
+    
+
+
+@app.route("/stats")
+@nocache
+def stats():
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
+    
+    user_ref = db.collection("users").document(user_uid)
     
     user_data = user_ref.get()
     if not user_data.exists:
@@ -202,10 +278,8 @@ def profile():
     activity = user_info["activity"]
     gender = user_info["gender"]
     
-    weight_log = user_info.get("weight_log", [])
-    weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
-    
-
+        
+    # Now calculate the BMI, body age, etc.
     person = Person(age, height, weight, gender)
     bmi = person.calculate_bmi()
     body_age = BodyAge().calculate(person)
@@ -218,58 +292,35 @@ def profile():
 
     strategy = strategy_map.get(activity, ActiveNutrition())
     calories, protein, fat, carbs = strategy.calculate_macros(person)
-    session["rec_calories"] = calories
-    session["rec_protein"] = protein
-    session["rec_carbs"] = carbs
     water_intake = calc_water_intake(person, activity)
     meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
-    
+
+# Update session with recalculated values
     session["bmi"] = bmi
+    session["rec_calories"] = calories
+    session["rec_protein"] = protein
     session["rec_fat"] = fat
+    session["rec_carbs"] = carbs
     session["water_intake"] = water_intake
-    session["meal_plan"] = meal_plan  
+    session["meal_plan"] = meal_plan
     session["body_age"] = body_age
-
-    session["weight_log"] = weight_log
-
-    return render_template(
-        "index.html",
-        bmi=bmi,
-        protein=protein,
-        calories=calories,
-        fat=fat,
-        carbs=carbs,
-        age=age,
-        height=height * 100,
-        weight=weight,
-        activity=activity,
-        gender=gender,
-        water_intake=water_intake,
-        meal_plan=meal_plan,
-        weight_log=weight_log,
-        body_age=body_age)
     
+    # Fetch weight log from the database for historical data
+    weight_log = user_info.get("weight_log", [])
+    weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
 
 
-@app.route("/stats")
-@nocache
-def stats():
-    
-    user_uid = session.get("user_uid")
-    if not user_uid:
-        return redirect(url_for("login"))
-    
     return render_template(
         "stats.html",
-        bmi=session.get("bmi"),
-        calories=session.get("rec_calories"),
-        protein=session.get("rec_protein"),
-        fat=session.get("rec_fat"),
-        carbs=session.get("rec_carbs"),
-        water_intake=session.get("water_intake"),
-        meal_plan=session.get("meal_plan"),
-        body_age=session.get("body_age"),
-        weight_log=session.get("weight_log", []),
+        bmi=bmi,
+        calories=calories,
+        protein=protein,
+        fat=fat,
+        carbs=carbs,
+        water_intake=water_intake,
+        meal_plan=meal_plan,
+        body_age=body_age,
+        weight_log=weight_log
     )
 
 
