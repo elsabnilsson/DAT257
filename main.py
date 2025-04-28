@@ -17,6 +17,7 @@ import requests
 from firebase_admin.auth import EmailAlreadyExistsError
 
 FIREBASE_API_KEY = "AIzaSyCrlsFF_qHY40TczFJ6jmZEmcKcHY__fmg"
+from body_age import BodyAge
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
@@ -83,7 +84,9 @@ def set_password():
                 "gender": gender,
             })
 
-            return redirect(url_for("login"))
+            session["user_uid"] = user.uid  # <- This line makes them "logged in"
+
+            return redirect(url_for("profile"))
 
         except EmailAlreadyExistsError:
             error = "A user with this email already exists."
@@ -192,6 +195,7 @@ def profile():
 
     person = Person(age, height, weight, gender)
     bmi = person.calculate_bmi()
+    body_age = BodyAge().calculate(person)
 
     strategy_map = {
         "inactive": InactiveNutrition(),
@@ -211,6 +215,8 @@ def profile():
     session["rec_fat"] = fat
     session["water_intake"] = water_intake
     session["meal_plan"] = meal_plan  
+    session["body_age"] = body_age
+
     session["weight_log"] = weight_log
 
     return render_template(
@@ -227,11 +233,14 @@ def profile():
         gender=gender,
         water_intake=water_intake,
         meal_plan=meal_plan,
-        weight_log=weight_log
-    )
+        weight_log=weight_log,
+        body_age=body_age)
+    
 
 
 @app.route("/stats")
+
+
 def stats():
     return render_template(
         "stats.html",
@@ -242,6 +251,7 @@ def stats():
         carbs=session.get("rec_carbs"),
         water_intake=session.get("water_intake"),
         meal_plan=session.get("meal_plan"),
+        body_age=session.get("body_age"),
         weight_log=session.get("weight_log", []),
     )
 

@@ -82,6 +82,13 @@
             </div>
           {% endif %}
 
+          {% if body_age %}
+          <div>
+            <strong>Body Age: </strong> {{ body_age }} years
+          </div>
+          {% endif %}
+          
+
           <div class="mt-3">
             <h6 style="font-size: 0.8em;">That's about this many glasses of water:</h6>
             {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
