@@ -15,12 +15,23 @@ from flask import Flask, request, session, redirect, url_for, render_template
 from flask import Flask, render_template, request, redirect, url_for, flash
 import requests
 from firebase_admin.auth import EmailAlreadyExistsError
+from flask import make_response, jsonify
 
 FIREBASE_API_KEY = "AIzaSyCrlsFF_qHY40TczFJ6jmZEmcKcHY__fmg"
 from body_age import BodyAge
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")
+
+def nocache(view):
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "-1"
+        return response
+    no_cache.__name__ = view.__name__
+    return no_cache
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -118,6 +129,7 @@ def login():
             r.raise_for_status()
             data = r.json()
             session["user_uid"] = data["localId"]
+            session["user_email"] = email  
             
             return redirect(url_for("stats"))
 
@@ -128,6 +140,7 @@ def login():
 
 
 @app.route("/profile", methods=["GET", "POST"])
+@nocache
 def profile():
     user_uid = session.get("user_uid")
     if not user_uid:
@@ -239,9 +252,13 @@ def profile():
 
 
 @app.route("/stats")
-
-
+@nocache
 def stats():
+    
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
+    
     return render_template(
         "stats.html",
         bmi=session.get("bmi"),
@@ -257,7 +274,11 @@ def stats():
 
 
 @app.route("/recipes")
+@nocache
 def recipes():
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
 
     query = request.args.get("query", "side salad")
 
@@ -306,10 +327,15 @@ def recipes():
     )
 
 @app.route("/workouts")
+@nocache
 def workouts():
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
+    
     return render_template("workouts.html")
 
-@app.route("/logout")
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
     session.clear()
     return redirect(url_for("login"))
@@ -337,8 +363,73 @@ def change_password():
         return redirect(url_for("login"))
 
     return render_template("change_password.html", current_route=request.endpoint)
-    
 
+
+@app.route("/update_password", methods=["GET", "POST"])
+@nocache
+def update_password():
+    error = None
+
+
+    # Check if the user is logged in by verifying session data
+    if "user_uid" not in session:
+        return redirect(url_for("login"))  # Redirect to login if not logged in
+
+    if request.method == "POST":
+
+        try:
+            password = request.form["password"]
+            new_password = request.form["new_password"]
+            confirm_password = request.form["confirm_password"]
+
+            # Check if the new password and confirmation match
+            if new_password != confirm_password:
+                error = "New passwords do not match. Please try again."
+            else:
+            # Get the logged-in user's email (this should be stored in session or retrieved from the database)
+                email = session.get("user_email")  # Assuming email is stored in session during login
+
+            # Step 1: Authenticate user with old password
+                payload = {
+                    "email": email,
+                    "password": password,
+                    "returnSecureToken": True
+                }
+
+                try:
+                    # Try signing in with the old password
+                    r = requests.post(
+                        f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}",
+                        json=payload
+                    )
+                    r.raise_for_status()
+                    data = r.json()
+
+                    # Step 2: Update password using Firebase API
+                    update_payload = {
+                        "idToken": data["idToken"],  # ID Token from the sign-in response
+                        "password": new_password,
+                        "returnSecureToken": True
+                    }
+
+                    # Request to update the password
+                    update_r = requests.post(
+                        f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={FIREBASE_API_KEY}",
+                        json=update_payload
+                    )
+                    update_r.raise_for_status()
+
+                    # Redirect to profile or any other page after success
+         
+                    return redirect(url_for("profile"))
+
+                except requests.exceptions.RequestException:
+                    error = "Old password is incorrect. Please try again."
+
+        except KeyError as e:
+            error = f"Missing field: {e}"
+            
+    return render_template("update_password.html", error=error, current_route=request.endpoint)
 
 if __name__ == "__main__":
     app.run(debug=True)
