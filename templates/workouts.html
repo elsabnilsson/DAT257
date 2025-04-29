@@ -2,24 +2,28 @@
 {% block title %}Workouts{% endblock %}
 {% block content %}
 <div class="container mt-5">
-  <h1 class="mb-4">Search Exercises by Body Part</h1>
+  <h1 class="mb-4 text-center">Search Exercises by Body Part</h1>
 
-  <form method="get">
-    <div class="input-group mb-3">
-      <select class="form-select" name="body_part" required>
-        <option value="">Select body part</option>
-        {% for part in ['back', 'chest', 'upper arms', 'lower arms', 'upper legs', 'lower legs', 'cardio', 'shoulders', 'waist', 'neck'] %}
-          <option value="{{ part }}" {% if body_part == part %}selected{% endif %}>{{ part|capitalize }}</option>
-        {% endfor %}
-      </select>
-      <button class="btn btn-primary" type="submit">Search</button>
+  <form method="get" class="mb-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-8">
+        <div class="input-group">
+          <select class="form-select" name="body_part" required>
+            <option value="">Select body part</option>
+            {% for part in ['back', 'chest', 'upper arms', 'lower arms', 'upper legs', 'lower legs', 'cardio', 'shoulders', 'waist', 'neck'] %}
+              <option value="{{ part }}" {% if body_part == part %}selected{% endif %}>{{ part|capitalize }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn" type="submit" style="background-color: #433118; color: white;">Search</button>
+        </div>
+      </div>
     </div>
   </form>
 
   {% if exercises %}
-    <div class="row">
+    <div class="row g-4">
       {% for ex in exercises %}
-        <div class="col-md-4 mb-4">
+        <div class="col-12 col-sm-6 col-md-4">
           <div class="card h-100">
             {% if ex.gifUrl %}
               <img src="{{ ex.gifUrl }}" class="card-img-top" alt="{{ ex.name }}">
