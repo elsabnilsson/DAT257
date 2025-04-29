@@ -1,5 +1,12 @@
 class Person:
     def __init__(self, age, height_m, weight_kg, gender):
+        if not (18 <= age <= 100):
+            raise ValueError("Age must be between 18 and 100.")
+        if not (1.2 <= height_m <= 2.5):
+            raise ValueError("Height must be between 120 and 250 cm.")
+        if not (30 <= weight_kg <= 300):
+            raise ValueError("Weight must be between 30 and 300 kg.")
+        
         self.age = age
         self.height = height_m
         self.weight = weight_kg
