@@ -186,18 +186,16 @@
           <form method="post">
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%;">
               <input
-                type="number"
+                type="date"
                 class="form-control"
-                name="age"
-                id="age"
-                value="{{ age }}"
-                placeholder="Age"
+                name="date_of_birth"
+                id="date_of_birth"
+                value="{{ date_of_birth }}"
+                placeholder="Date of Birth"
                 required
-                min="18"
-                max="100"
                 oninput="toggleLabel(this)"
               />
-              <span class="input-label-right" id="label-age">Age</span>
+              <span class="input-label-right" id="label-date_of_birth">DOB</span>
             </div>
 
             <div class="mb-3" style="padding-bottom: 3%; padding-top: 3%;">
