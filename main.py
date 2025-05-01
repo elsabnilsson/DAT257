@@ -153,6 +153,11 @@ def profile():
     weight = user_info["weight"]
     activity = user_info["activity"]
     gender = user_info["gender"]
+    # Retrieve and sort water log
+    water_log = user_info.get("water_log", [])
+    water_log_sorted = sorted(water_log, key=lambda x: x["date"])
+    session["water_log"] = water_log_sorted
+
     
     current_date = date.today().strftime("%Y-%m-%d")
     if 'water_glasses' not in session or session.get("water_date") != current_date:
@@ -298,8 +303,21 @@ def stats():
     glasses_count = math.ceil(water_intake / 0.25)  # recomended daily intake in glasses
 
     if request.args.get('click_glass'):
-        if session["water_glasses"] < glasses_count:
-            session["water_glasses"] += 1
+        current_date = date.today().strftime("%Y-%m-%d")
+        if session["water_date"] != current_date:
+            session["water_glasses"] = 0
+            session["water_date"] = current_date
+
+        session["water_glasses"] += 1
+
+        # store to database
+        user_ref = db.collection("users").document(session["user_uid"])
+        user_ref.update({
+            "water_log": ArrayUnion([{
+                "date": current_date,
+                "glasses": session["water_glasses"]
+            }])
+        })
 
         return redirect(url_for("stats"))
     
@@ -315,6 +333,7 @@ def stats():
         body_age=session.get("body_age"),
         weight_log=session.get("weight_log", []),
         water_glasses=session.get("water_glasses", 0),
+        water_log=session.get("water_log", []),
     )
 
 @app.route("/remove_water_glass", methods=["POST"])
