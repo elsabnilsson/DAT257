@@ -7,7 +7,8 @@ import os
 from flask import redirect, url_for
 from firebase_admin import auth
 from firebase_config import db
-from datetime import datetime
+from datetime import datetime, date
+import math
 from google.cloud.firestore_v1 import ArrayUnion
 from body_age import BodyAge
 
@@ -153,6 +154,14 @@ def profile():
     activity = user_info["activity"]
     gender = user_info["gender"]
     
+    current_date = date.today().strftime("%Y-%m-%d")
+    if 'water_glasses' not in session or session.get("water_date") != current_date:
+        session["water_glasses"] = 0
+        session["water_date"] = current_date
+
+    if request.args.get('click_glass'):
+        session["water_glasses"] += 1
+
     weight_log = user_info.get("weight_log", [])
     weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
     
@@ -198,7 +207,9 @@ def profile():
         water_intake=water_intake,
         meal_plan=meal_plan,
         weight_log=weight_log,
-        body_age=body_age)
+        body_age=body_age,
+        water_glasses=session.get("water_glasses", 0)
+    )
     
 
 
@@ -279,10 +290,19 @@ def index():
     
 """
 
-@app.route("/stats")
+@app.route("/stats", methods=["GET", "POST"])
 
 
 def stats():
+    water_intake = session.get("water_intake", 0)  # recommended daily intake
+    glasses_count = math.ceil(water_intake / 0.25)  # recomended daily intake in glasses
+
+    if request.args.get('click_glass'):
+        if session["water_glasses"] < glasses_count:
+            session["water_glasses"] += 1
+
+        return redirect(url_for("stats"))
+    
     return render_template(
         "stats.html",
         bmi=session.get("bmi"),
@@ -294,7 +314,19 @@ def stats():
         meal_plan=session.get("meal_plan"),
         body_age=session.get("body_age"),
         weight_log=session.get("weight_log", []),
+        water_glasses=session.get("water_glasses", 0),
     )
+
+@app.route("/remove_water_glass", methods=["POST"])
+def remove_water_glass():
+    current_date = date.today().strftime("%Y-%m-%d")
+    if session.get("water_date") != current_date:
+        session["water_glasses"] = 0
+        session["water_date"] = current_date
+
+    if session.get("water_glasses", 0) > 0:
+        session["water_glasses"] -= 1
+    return redirect(url_for("stats"))
 
 
 @app.route("/recipes")

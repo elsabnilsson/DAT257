@@ -30,6 +30,29 @@
     max-width: 250px;        
     text-align: left;        
   }
+
+  .glass-button {
+    background-color: #433118;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 4px 12px;
+    font-size: 0.9em;
+    width: 180px;
+    cursor: pointer;
+  }
+
+  .glass-button:hover {
+    background-color: #5b4223;
+  }
+
+  .glass-button:disabled {
+    background-color: #b0b0b0; /* Greyish color */
+    color: #d1d1d1; /* Lighter text color */
+    cursor: not-allowed; /* Change the cursor to indicate the button is disabled */
+    border: 1px solid #999; /* Optionally change the border to a grey color */
+}
+
 </style>
 
 <body style="background-color: #f7e5c1;">
@@ -96,13 +119,27 @@
               style="display: flex; flex-wrap: wrap; justify-content: left; width: 100%; margin-top: -3px; margin-bottom: -5px;"
               title="Each glass represents 0.25 liters of water — Total: {{ glasses_count }} glasses">
               {% for i in range(glasses_count) %}
-                <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
-                  <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 60px; height: 55px;">
-                </div>
+              <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
+                <img src="{{ url_for('static', filename='glassofwater_' + ('filled' if i < water_glasses else 'empty') + '.png') }}" 
+                  alt="Glass" style="width: 60px; height: 55px;">
+               </div>
               {% endfor %}
             </div>
           </div>
         </div>
+
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+          <form method="get" action="{{ url_for('stats') }}" style="flex: 1; max-width: 180px;">
+            <button type="submit" name="click_glass" value="1" class="glass-button"
+            {% if water_glasses >= glasses_count %} disabled {% endif %}>
+            Add drunken glass</button>
+          </form>
+        
+          <form method="post" action="{{ url_for('remove_water_glass') }}" style="flex: 1; max-width: 180px;">
+            <button type="submit" class="glass-button">Remove drunken glass</button>
+          </form>
+        </div>
+        
 
         {% if protein and fat and carbs %}
           <div class="mt-5" style="max-width: 500px; margin: auto;">
