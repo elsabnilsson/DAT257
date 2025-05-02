@@ -1,8 +1,44 @@
 {% extends "base.html" %}
-{% block title %}About{% endblock %}
+{% block title %}Workouts{% endblock %}
 {% block content %}
-  <div class="container mt-5 text-center">
-    <h1>workouts</h1>
-    <p>workouts page</p>
-  </div>
+<div class="container mt-5">
+  <h1 class="mb-4 text-center">Search Exercises by Body Part</h1>
+
+  <form method="get" class="mb-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-10 col-lg-8">
+        <div class="input-group">
+          <select class="form-select" name="body_part" required>
+            <option value="">Select body part</option>
+            {% for part in ['back', 'chest', 'upper arms', 'lower arms', 'upper legs', 'lower legs', 'cardio', 'shoulders', 'waist', 'neck'] %}
+              <option value="{{ part }}" {% if body_part == part %}selected{% endif %}>{{ part|capitalize }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn" type="submit" style="background-color: #433118; color: white;">Search</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  {% if exercises %}
+    <div class="row g-4">
+      {% for ex in exercises %}
+        <div class="col-12 col-sm-6 col-md-4">
+          <div class="card h-100">
+            {% if ex.gifUrl %}
+              <img src="{{ ex.gifUrl }}" class="card-img-top" alt="{{ ex.name }}">
+            {% endif %}
+            <div class="card-body">
+              <h5 class="card-title text-capitalize">{{ ex.name }}</h5>
+              <p class="card-text">
+                Target: {{ ex.target }}<br>
+                Equipment: {{ ex.equipment }}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
