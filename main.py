@@ -421,65 +421,51 @@ def change_password():
 def update_password():
     error = None
 
-
-    # Check if the user is logged in by verifying session data
     if "user_uid" not in session:
-        return redirect(url_for("login"))  # Redirect to login if not logged in
+        return redirect(url_for("login"))
 
     if request.method == "POST":
+        password = request.form.get("password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
 
-        try:
-            password = request.form["password"]
-            new_password = request.form["new_password"]
-            confirm_password = request.form["confirm_password"]
+        if not all([password, new_password, confirm_password]):
+            error = "Please fill in all required fields."
+        elif new_password != confirm_password:
+            error = "New passwords do not match. Please try again."
+        else:
+            email = session.get("user_email")
+            payload = {
+                "email": email,
+                "password": password,
+                "returnSecureToken": True
+            }
 
-            # Check if the new password and confirmation match
-            if new_password != confirm_password:
-                error = "New passwords do not match. Please try again."
-            else:
-            # Get the logged-in user's email (this should be stored in session or retrieved from the database)
-                email = session.get("user_email")  # Assuming email is stored in session during login
+            try:
+                r = requests.post(
+                    f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}",
+                    json=payload
+                )
+                r.raise_for_status()
+                data = r.json()
 
-            # Step 1: Authenticate user with old password
-                payload = {
-                    "email": email,
-                    "password": password,
+                update_payload = {
+                    "idToken": data["idToken"],
+                    "password": new_password,
                     "returnSecureToken": True
                 }
 
-                try:
-                    # Try signing in with the old password
-                    r = requests.post(
-                        f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={FIREBASE_API_KEY}",
-                        json=payload
-                    )
-                    r.raise_for_status()
-                    data = r.json()
+                update_r = requests.post(
+                    f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={FIREBASE_API_KEY}",
+                    json=update_payload
+                )
+                update_r.raise_for_status()
 
-                    # Step 2: Update password using Firebase API
-                    update_payload = {
-                        "idToken": data["idToken"],  # ID Token from the sign-in response
-                        "password": new_password,
-                        "returnSecureToken": True
-                    }
+                return redirect(url_for("profile"))
 
-                    # Request to update the password
-                    update_r = requests.post(
-                        f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={FIREBASE_API_KEY}",
-                        json=update_payload
-                    )
-                    update_r.raise_for_status()
+            except requests.exceptions.RequestException:
+                error = "Old password is incorrect. Please try again."
 
-                    # Redirect to profile or any other page after success
-         
-                    return redirect(url_for("profile"))
-
-                except requests.exceptions.RequestException:
-                    error = "Old password is incorrect. Please try again."
-
-        except KeyError as e:
-            error = f"Missing field: {e}"
-            
     return render_template("update_password.html", error=error, current_route=request.endpoint)
 
 if __name__ == "__main__":
