@@ -244,24 +244,38 @@ def profile():
     weight = user_info["weight"]
     activity = user_info["activity"]
     gender = user_info["gender"]
-    # Retrieve and sort water log
-    water_log = user_info.get("water_log", [])
-    water_log_sorted = sorted(water_log, key=lambda x: x["date"])
-    session["water_log"] = water_log_sorted
 
+    return render_template(
+        "index.html",
+        age=age,
+        height=height * 100,
+        weight=weight,
+        activity=activity,
+        gender=gender,
+    )
+
+@app.route("/stats", methods=["GET", "POST"])
+@nocache
+def stats():
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
     
-    current_date = date.today().strftime("%Y-%m-%d")
-    if 'water_glasses' not in session or session.get("water_date") != current_date:
-        session["water_glasses"] = 0
-        session["water_date"] = current_date
-
-    if request.args.get('click_glass'):
-        session["water_glasses"] += 1
-
-    weight_log = user_info.get("weight_log", [])
-    weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
+    user_ref = db.collection("users").document(user_uid)
     
+    user_data = user_ref.get()
+    if not user_data.exists:
+        return "User profile not found", 404
 
+    user_info = user_data.to_dict()
+    age = user_info["age"]
+    height = user_info["height"]
+    weight = user_info["weight"]
+    activity = user_info["activity"]
+    gender = user_info["gender"]
+    
+        
+    # Now calculate the BMI, body age, etc.
     person = Person(age, height, weight, gender)
     bmi = person.calculate_bmi()
     body_age = BodyAge().calculate(person)
@@ -276,6 +290,39 @@ def profile():
     calories, protein, fat, carbs = strategy.calculate_macros(person)
     water_intake = calc_water_intake(person, activity)
     meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
+    
+    water_log = user_info.get("water_log", [])
+    water_log_sorted = sorted(water_log, key=lambda x: x["date"])
+    session["water_log"] = water_log_sorted
+    
+    current_date = date.today().strftime("%Y-%m-%d")
+    if 'water_glasses' not in session or session.get("water_date") != current_date:
+        session["water_glasses"] = 0
+        session["water_date"] = current_date
+
+    #if request.args.get('click_glass'):
+     #   session["water_glasses"] += 1
+
+    
+    water_intake = session.get("water_intake", 0)  # recommended daily intake
+    glasses_count = math.ceil(water_intake / 0.25)  # recomended daily intake in glasses
+
+    if request.args.get('click_glass'):
+        current_date = date.today().strftime("%Y-%m-%d")
+        if session["water_date"] != current_date:
+            session["water_glasses"] = 0
+            session["water_date"] = current_date
+
+        session["water_glasses"] += 1
+
+        # store to database
+        user_ref = db.collection("users").document(session["user_uid"])
+        user_ref.update({
+            "water_log": ArrayUnion([{
+                "date": current_date,
+                "glasses": session["water_glasses"]
+            }])
+        })
 
 # Update session with recalculated values
     session["bmi"] = bmi
@@ -301,50 +348,12 @@ def profile():
         carbs=carbs,
         water_intake=water_intake,
         meal_plan=meal_plan,
-        weight_log=weight_log,
         body_age=body_age,
-        water_glasses=session.get("water_glasses", 0)
-    )
-    
-@app.route("/stats", methods=["GET", "POST"])
-
-def stats():
-    water_intake = session.get("water_intake", 0)  # recommended daily intake
-    glasses_count = math.ceil(water_intake / 0.25)  # recomended daily intake in glasses
-
-    if request.args.get('click_glass'):
-        current_date = date.today().strftime("%Y-%m-%d")
-        if session["water_date"] != current_date:
-            session["water_glasses"] = 0
-            session["water_date"] = current_date
-
-        session["water_glasses"] += 1
-
-        # store to database
-        user_ref = db.collection("users").document(session["user_uid"])
-        user_ref.update({
-            "water_log": ArrayUnion([{
-                "date": current_date,
-                "glasses": session["water_glasses"]
-            }])
-        })
-
-        return redirect(url_for("stats"))
-    
-    return render_template(
-        "stats.html",
-        bmi=session.get("bmi"),
-        calories=session.get("rec_calories"),
-        protein=session.get("rec_protein"),
-        fat=session.get("rec_fat"),
-        carbs=session.get("rec_carbs"),
-        water_intake=session.get("water_intake"),
-        meal_plan=session.get("meal_plan"),
-        body_age=session.get("body_age"),
-        weight_log=session.get("weight_log", []),
+        weight_log=weight_log,
         water_glasses=session.get("water_glasses", 0),
-        water_log=session.get("water_log", []),
+        water_log=session.get("water_log", [])
     )
+
 
 @app.route("/remove_water_glass", methods=["POST"])
 def remove_water_glass():
