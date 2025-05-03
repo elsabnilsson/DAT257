@@ -1,45 +1,40 @@
 {% if bmi is not none and bmi is string == false %}
-  <div class="mt-4">
-    <h5>BMI Classification</h5>
-    <div style="
-      position: relative;
-      height: 30px;
-      width: 100%;
-      max-width: 500px;
-      border-radius: 5px;
-      background: linear-gradient(to right,
-        #2196F3 0%,        /* Underweight */
-        #2196F3 37%,
-        #4CAF50 37%,       /* Normal */
-        #4CAF50 48.9%,
-        #FFC107 50%,       /* Overweight */
-        #FFC107 59.9%,
-        #F44336 60%,       /* Obeseity class I */
-        #F44336 69.9%,
-        #9c2921 70%,       /* Obeseity class II */
-        #9c2921 79.9%,
-        #52120d 80%,       /* Obeseity class III */
-        #52120d 100%);
-    ">
+  <div class="d-flex justify-content-center mt-4">
+    <div style="position: relative; max-width: 500px; width: 100%;">
+      <!-- BMI Color Bar -->
       <div style="
-        position: absolute;
-        left: calc(min(max({{ bmi }}, 0), 50) * 2%);
-        transform: translateX(-50%);
-        top: -10px;
-        width: 3px;
-        height: 50px;
-        background: black;
-      "></div>
+        position: relative;
+        height: 30px;
+        border-radius: 5px;
+        background: linear-gradient(to right,
+          #2196F3 0%, #2196F3 37%,
+          #4CAF50 37%, #4CAF50 48.9%,
+          #FFC107 50%, #FFC107 59.9%,
+          #F44336 60%, #F44336 69.9%,
+          #9c2921 70%, #9c2921 79.9%,
+          #52120d 80%, #52120d 100%);
+      ">
+        <div style="
+          position: absolute;
+          left: calc(min(max({{ bmi }}, 0), 50) * 2%);
+          transform: translateX(-50%);
+          top: -10px;
+          width: 3px;
+          height: 50px;
+          background: black;
+        "></div>
+      </div>
+
+      <!-- Vertical Labels -->
+      <div style="position: relative; height: 75px; margin-top: 10px;">
+        <span style="position: absolute; left: 18.5%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Underweight</span>
+        <span style="position: absolute; left: 43%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Normal</span>
+        <span style="position: absolute; left: 55%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Overweight</span>
+        <span style="position: absolute; left: 65%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity I</span>
+        <span style="position: absolute; left: 75%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity II</span>
+        <span style="position: absolute; left: 90%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity III</span>
+      </div>
     </div>
-    <div style="position: relative; max-width: 500px; height: 75px; ">
-      <span style="position: absolute; left: 18.5%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Underweight</span>
-      <span style="position: absolute; left: 43%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Normal</span>
-      <span style="position: absolute; left: 55%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Overweight</span>
-      <span style="position: absolute; left: 65%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity I</span>
-      <span style="position: absolute; left: 75%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity II</span>
-      <span style="position: absolute; left: 90%; transform: translateX(-50%) rotate(-90deg); transform-origin: center; font-size: 0.8rem; top: 50%; white-space: nowrap;">Obesity III</span>
-    </div>
-    
   </div>
 {% elif bmi is string %}
   <div class="alert alert-danger mt-4">

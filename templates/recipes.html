@@ -1,100 +1,190 @@
 {% extends "base.html" %}
 {% block title %}Recipes{% endblock %}
 {% block content %}
-  <div class="container mt-5 row">
-    <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto; text-align: center;">
-      <h1>Search Recipes</h1>
+  <style>
+    .selector-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #f7e5c1;
+      color: #433118;
+      border: 1px solid #433118;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 0.5rem;
+    }
+    .selector-option input { display: none; }
+    .selector-option.selected {
+      background-color: #5D7A3A;
+      color: white;
+      border-color: #5D7A3A;
+    }
 
-      <form method="get" class="mb-4">
-        <div class="mb-2 row">
-          <div class="col-md-8">
-            <div class="row">
-              <input
-                type="checkbox"
-                id="vegetarian"
-                name="vegetarian"
-                class="form-check-input ms-3 col-md-1"
-                {% if request.args.get('vegetarian') %}checked{% endif %}
-              >
-              <label for="vegetarian" class="form-check-label col">Vegetarian</label>
-            </div>
-            <div class="row">
-              <input
-                type="checkbox"
-                id="lactose"
-                name="lactose"
-                class="form-check-input ms-3 col-md-1"
-                {% if request.args.get('lactose') %}checked{% endif %}
-              >
-              <label for="lactose" class="form-check-label col">Lactose intolerant</label>
-            </div>
-            <div class="row">
-              <input
-                type="checkbox"
-                id="gluten"
-                name="gluten"
-                class="form-check-input ms-3 col-md-1"
-                {% if request.args.get('gluten') %}checked{% endif %}
-              >
-              <label for="gluten" class="form-check-label col">Gluten intolerant</label>
-            </div>
-          </div>
-          <div class="mb-2 col-md-4">
-            <label for="meal" class="form-label">Choose meal:</label>
-            <select name="meal" id="meal" class="form-select w-auto d-inline-block">
-              {% for m in ["Breakfast","Lunch","Dinner","Snack"] %}
-                <option value="{{ m }}"
-                  {% if request.args.get("meal", "Breakfast") == m %}selected{% endif %}>
-                  {{ m }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      
-        <div class="input-group">
-          <input
-            type="text"
-            name="query"
-            class="form-control"
-            placeholder="e.g. side salad"
-            value="{{ query }}"
-            required
-          >
-          <button class="btn btn-primary" style="background-color: #433118; border-color:#433118;" type="submit">Search</button>
-        </div>
-      </form>
+    .meal-col, .diet-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .meal-col { padding-right: 0.5rem; }
+    .diet-col { padding-left: 0.5rem; }
+    .meal-col .selector-option,
+    .diet-col .selector-option {
+      flex: 1;
+      margin-bottom: 0;
+    }
 
-      {% if recipes and recipes.results %}
-        <div class="row">
+    .result-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f7e5c1;
+      color: #433118;
+      border-top: 1px solid #433118;
+      border-radius: 0 0 0.25rem 0.25rem;
+      padding: 1.25rem 0.75rem 0.5rem;
+      cursor: pointer;
+      margin: 1rem 0;
+    }
+    .result-title:first-of-type { margin-top: 0; }
+    .result-title .arrow {
+      transition: transform 0.3s ease;
+      font-size: 0.8rem;
+    }
+    .result-title.expanded .arrow { transform: rotate(180deg); }
+
+    .detail-card {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      background-color: #f7e5c1;
+      border: none;
+      border-radius: 0 0 0.25rem 0.25rem;
+      padding-bottom: 1rem;
+    }
+    .detail-card.open { max-height: 1000px; }
+
+    /* Image styling within detail-card */
+    .detail-card .col-8 img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 0.5rem 0 0 0.5rem;
+    }
+    /* Text box styling: dark brown background */
+    .text-box {
+      background-color: #433118;
+      color: white;
+      padding: 1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+  </style>
+
+  <!-- Full-width dark brown header with selectors and search -->
+  <div style="width:100vw; position:relative; left:50%; margin-left:-50vw; background-color:#433118; padding:2rem 0;">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-4 p-0">
+          <form method="get">
+            <div class="row mb-3 gx-0">
+              <div class="col-8 meal-col ps-0">
+                {% for m in ["Breakfast","Lunch","Dinner","Snack"] %}
+                  <label class="selector-option {% if request.args.get('meal','Breakfast') == m %}selected{% endif %}">
+                    <input type="radio" name="meal" value="{{ m }}" {% if request.args.get('meal','Breakfast') == m %}checked{% endif %}>
+                    {{ m }}
+                  </label>
+                {% endfor %}
+              </div>
+              <div class="col-4 diet-col pe-0">
+                {% for f in ['vegetarian','lactose','gluten'] %}
+                  {% if f == 'vegetarian' %}
+                    {% set label = 'Vegetarian' %}
+                  {% elif f == 'lactose' %}
+                    {% set label = 'Lactose intolerant' %}
+                  {% else %}
+                    {% set label = 'Gluten intolerant' %}
+                  {% endif %}
+                  <label class="selector-option {% if request.args.get(f) or (f=='vegetarian' and not request.args) %}selected{% endif %}">
+                    <input type="checkbox" name="{{ f }}" {% if request.args.get(f) or (f=='vegetarian' and not request.args) %}checked{% endif %}>
+                    {{ label }}
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="input-group">
+              <input type="text" name="query" class="form-control" placeholder="e.g. side salad" value="{{ query }}" required>
+              <button class="btn" type="submit" style="background-color:#f7e5c1; border:none; color:#433118;">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results with side-by-side card layout and rounded, padded View Recipe button -->
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-4 p-0">
+        {% if recipes and recipes.results %}
           {% for r in recipes.results %}
-            <div class="col-md-12">
-              <div class="card h-100">
-                <img src="{{ r.image }}" class="card-img-top" alt="{{ r.title }}">
-                <div class="card-body">
-                  <h5 class="card-title">{{ r.title }}</h5>
-                  <p class="card-text">
-                    Ready in {{ r.readyInMinutes }} min<br>
-                    Calories: {{ r.nutrition.nutrients
-                      | selectattr("name", "equalto", "Calories")
-                      | map(attribute="amount")
-                      | first }} kcal
-                  </p>
-                  <a
-                    href="https://spoonacular.com/recipes/{{ r.id }}"
-                    target="_blank"
-                    class="btn btn-sm btn-outline-secondary"
-                  >
-                    View
+            <div class="result-card">
+              <div class="result-title">
+                <span>{{ r.title }}</span>
+                <span class="arrow">▲</span>
+              </div>
+              <div class="detail-card card p-0">
+                <div class="row g-0">
+                  <div class="col-8 p-0" >
+                    <img src="{{ r.image }}" alt="{{ r.title }}" style="height: 170px;">
+                  </div>
+                  <div class="col-4 p-0">
+                    <div class="text-box" style="margin-left: 1rem; height:170px;">
+                      <p class="mb-1">Ready in: <br> {{ r.readyInMinutes }} min</p>
+                      <p class="mb-1">Calories: <br> {{ r.nutrition.nutrients | selectattr("name","equalto","Calories") | map(attribute="amount") | first }} kcal</p>
+                    </div>
+                  </div>
+                  <a href="https://spoonacular.com/recipes/{{ r.id }}" target="_blank"
+                      class="btn w-100"
+                      style="background-color:#433118; color:white; border:none; border-radius:0.5rem; margin-top: 1rem; margin-bottom: 1rem;">
+                    View Recipe
                   </a>
                 </div>
               </div>
             </div>
           {% endfor %}
-        </div>
-      {% else %}
-        <p>No recipes found for “{{ query }}”.</p>
-      {% endif %}
+        {% else %}
+          <p class="text-center">No recipes found for “{{ query }}”.</p>
+        {% endif %}
+      </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.selector-option input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', () => input.parentElement.classList.toggle('selected', input.checked));
+      });
+      document.querySelectorAll('.selector-option input[type="radio"]').forEach(input => {
+        input.addEventListener('change', e => {
+          document.querySelectorAll(`input[name="${e.target.name}"]`).forEach(r => r.parentElement.classList.toggle('selected', r.checked));
+        });
+      });
+      document.querySelectorAll('.result-card').forEach(card => {
+        const title = card.querySelector('.result-title');
+        const detail = card.querySelector('.detail-card');
+        const arrow = title.querySelector('.arrow');
+        title.addEventListener('click', () => {
+          const open = detail.classList.toggle('open');
+          title.classList.toggle('expanded', open);
+          arrow.textContent = open ? '▼' : '▲';
+        });
+      });
+    });
+  </script>
 {% endblock %}

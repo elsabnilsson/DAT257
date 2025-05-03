@@ -26,9 +26,9 @@
     left: 20px;
     z-index: 1000;
     font-size: 0.85rem;
-    white-space: normal;     
-    max-width: 250px;        
-    text-align: left;        
+    white-space: normal;
+    max-width: 250px;
+    text-align: left;
   }
 
   .glass-button {
@@ -56,74 +56,113 @@
 </style>
 
 <body style="background-color: #f7e5c1;">
-  <div class="container mt-5" style="text-align: center;">
-    <div class="position-relative text-center" style="display: inline-block;">
 
-      {% if bmi is not none %}
-        <div class="container mt-5" style="width: 450px; margin: 0 auto; text-align: center;">
-          <div style="padding-bottom: 0%; font-size: 16pt;">
-            <strong>Your BMI: </strong> {{ bmi }}
-            <span class="tooltip-asterisk">*</span>
-            <span class="tooltip-text">BMI is an approximate estimate of your fysical fitness. Note that individual condidtions may affect the accuracy of this estimate. BMI alone should not be used to estimate how healthy a person is.</span>
-          </div>
-
-          {% include "bmi_visual.html" %}
+  {% if bmi is not none %}
+  <div style="width: 100vw; margin-left: calc(-50vw + 50%); background-color: #d2b48c;" class="py-4">
+    <div class="d-flex justify-content-center">
+      <div class="col-md-4 text-center">
+        <div style="font-size: 16pt;">
+          <strong>Your BMI: </strong> {{ bmi }}
+          <span class="tooltip-asterisk">*</span>
+          <span class="tooltip-text">
+            BMI is an approximate estimate of your physical fitness. Note that individual conditions may affect the accuracy of this estimate.
+            BMI alone should not be used to estimate how healthy a person is.
+          </span>
         </div>
 
-        <div class="container mt-5" style="width: 450px; margin: 0 auto; text-align: center;">
-          <div style="padding-bottom: 2%; font-size: 16pt;">
-            <strong>RECOMENDED DAILY </strong>
+        <div class="d-flex justify-content-center mt-3">
+          <div style="max-width: 100%; width: 100%;">
+            {% include "bmi_visual.html" %}
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
-          {% if calories %}
-            <div>
-              <strong>Calories: </strong> {{ calories }} kcal
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-4 text-center">
+
+        {% if bmi is not none %}
+        <div class="mb-4">
+          <div class="row">
+            <div class="col-6 text-start">
+              <div style="font-size: 16pt;">
+                <strong>RECOMMENDED DAILY</strong>
+              </div>
+              {% if calories %}
+                <div><strong>Calories:</strong> {{ calories }} kcal</div>
+              {% endif %}
+              {% if protein is not none %}
+                <div><strong>Protein:</strong> {{ protein }} g/day</div>
+              {% endif %}
+              {% if fat %}
+                <div><strong>Fat:</strong> {{ fat }} g/day</div>
+              {% endif %}
+              {% if carbs %}
+                <div><strong>Carbs:</strong> {{ carbs }} g/day</div>
+              {% endif %}
+              {% if water_intake %}
+                <div><strong>Water:</strong> {{ water_intake }} L/day</div>
+              {% endif %}
+              {% if body_age %}
+                <div><strong>Body Age:</strong> {{ body_age }} years</div>
+              {% endif %}
             </div>
-          {% endif %}
 
-          {% if protein is not none %}
-            <div>
-              <strong>Protein: </strong> {{ protein }} grams/day
+            {% if protein is not none and fat is not none and carbs is not none %}
+            <div class="col-6 text-center">
+              <h6>Macronutrients</h6>
+              <canvas id="macroChart" style="max-width: 100%; height: auto;"></canvas>
             </div>
-          {% endif %}
-
-          {% if fat %}
-            <div>
-              <strong>Fat: </strong> {{ fat }} grams/day
-            </div>
-          {% endif %}
-
-          {% if carbs %}
-            <div>
-              <strong>Carbs: </strong> {{ carbs }} grams/day
-            </div>
-          {% endif %}
-
-          {% if water_intake %}
-            <div>
-              <strong>Water: </strong> {{ water_intake }} liter/day
-            </div>
-          {% endif %}
-
-          {% if body_age %}
-          <div>
-            <strong>Body Age: </strong> {{ body_age }} years
+            {% endif %}
           </div>
-          {% endif %}
-          
+        </div>
 
-          <div class="mt-3">
-            <h6 style="font-size: 0.8em;">That's about this many glasses of water. Track your daily consumption and aim to fill all glasses!</h6>
-            {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
-            <div 
-              style="display: flex; flex-wrap: wrap; justify-content: left; width: 100%; margin-top: -3px; margin-bottom: -5px;"
-              title="Each glass represents 0.25 liters of water — Total: {{ glasses_count }} glasses">
-              {% for i in range(glasses_count) %}
-              <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
-                <img src="{{ url_for('static', filename='glassofwater_' + ('filled' if i < water_glasses else 'empty') + '.png') }}" 
-                  alt="Glass" style="width: 60px; height: 55px;">
-               </div>
-              {% endfor %}
+        {% if water_intake %}
+        <div class="mb-5">
+          <h6 style="font-size: 0.8em;">That's about this many glasses of water:</h6>
+          {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
+          <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            {% for i in range(glasses_count) %}
+              <div style="display: flex; justify-content: center; margin-top: -12px;">
+                <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 50px; height: 45px;">
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        {% if meal_plan %}
+        <!-- Styled Meal Split Section -->
+        <div style="width: 100vw; margin-left: calc(-50vw + 50%); background-color: #d2b48c;" class="py-4 mb-5">
+          <div class="d-flex justify-content-center">
+            <div class="col-md-4 text-center">
+              <h4 class="mb-3">Suggested Meal Split</h4>
+              <table class="table table-sm" style="border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 2px solid #433118;">
+                    <th style="background-color: #d2b48c;">Meal</th>
+                    <th style="background-color: #d2b48c;">Calories</th>
+                    <th style="background-color: #d2b48c;">Protein</th>
+                    <th style="background-color: #d2b48c;">Fat</th>
+                    <th style="background-color: #d2b48c;">Carbs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for meal, macros in meal_plan.items() %}
+                  <tr style="border-bottom: 1px solid #433118;">
+                    <td style="background-color: #d2b48c;">{{ meal }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.calories }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.protein }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.fat }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.carbs }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -146,6 +185,16 @@
             <h5 class="text-center">Macronutrient Distribution</h5>
             <canvas id="macroChart"></canvas>
           </div>
+        {% endif %}
+
+        <div class="mb-5">
+          <h5 class="text-center">Weight Over Time</h5>
+          <canvas id="weightChart" width="300" height="200"></canvas>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <script>
