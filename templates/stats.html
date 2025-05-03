@@ -35,7 +35,6 @@
 <body style="background-color: #f7e5c1;">
 
   {% if bmi is not none %}
-  <!-- Full-width darker brown background with centered BMI content -->
   <div style="width: 100vw; margin-left: calc(-50vw + 50%); background-color: #d2b48c;" class="py-4">
     <div class="d-flex justify-content-center">
       <div class="col-md-4 text-center">
@@ -48,7 +47,6 @@
           </span>
         </div>
 
-        <!-- Responsive and centered BMI chart -->
         <div class="d-flex justify-content-center mt-3">
           <div style="max-width: 100%; width: 100%;">
             {% include "bmi_visual.html" %}
@@ -105,7 +103,7 @@
           {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
           <div style="display: flex; flex-wrap: wrap; justify-content: center;">
             {% for i in range(glasses_count) %}
-              <div style="width: 25%; display: flex; justify-content: center; margin-top: -12px;">
+              <div style="display: flex; justify-content: center; margin-top: -12px;">
                 <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 50px; height: 45px;">
               </div>
             {% endfor %}
@@ -115,30 +113,35 @@
         {% endif %}
 
         {% if meal_plan %}
-        <div class="mb-5">
-          <h4>Suggested Meal Split</h4>
-          <table class="table table-sm">
-            <thead>
-              <tr>
-                <th>Meal</th>
-                <th>Calories</th>
-                <th>Protein</th>
-                <th>Fat</th>
-                <th>Carbs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for meal, macros in meal_plan.items() %}
-              <tr>
-                <td>{{ meal }}</td>
-                <td>{{ macros.calories }}</td>
-                <td>{{ macros.protein }}</td>
-                <td>{{ macros.fat }}</td>
-                <td>{{ macros.carbs }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <!-- Styled Meal Split Section -->
+        <div style="width: 100vw; margin-left: calc(-50vw + 50%); background-color: #d2b48c;" class="py-4 mb-5">
+          <div class="d-flex justify-content-center">
+            <div class="col-md-4 text-center">
+              <h4 class="mb-3">Suggested Meal Split</h4>
+              <table class="table table-sm" style="border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 2px solid #433118;">
+                    <th style="background-color: #d2b48c;">Meal</th>
+                    <th style="background-color: #d2b48c;">Calories</th>
+                    <th style="background-color: #d2b48c;">Protein</th>
+                    <th style="background-color: #d2b48c;">Fat</th>
+                    <th style="background-color: #d2b48c;">Carbs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for meal, macros in meal_plan.items() %}
+                  <tr style="border-bottom: 1px solid #433118;">
+                    <td style="background-color: #d2b48c;">{{ meal }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.calories }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.protein }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.fat }}</td>
+                    <td style="background-color: #d2b48c;">{{ macros.carbs }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
         {% endif %}
 

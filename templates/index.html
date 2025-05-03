@@ -116,48 +116,46 @@
       }
 
       input[readonly], select[disabled] {
-  background-color: #f0f0f0;  /* Light gray background */
-  color: #888;  /* Darker gray text */
-  border-color: #ddd;  /* Light gray border */
-  pointer-events: none;  /* Disables interaction */
-}
+        background-color: #f0f0f0;
+        color: #888;
+        border-color: #ddd;
+        pointer-events: none;
+      }
 
-/* Modal Styles */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
-}
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 300px;
-}
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 300px;
+      }
 
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
 
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
     </style>
 
   <body style="background-color: #f7e5c1;">
@@ -201,7 +199,6 @@
             </div>
 
             <div class="mb-3" style="padding-bottom: 3%; padding-top: 3%;">
-              
               <select class="form-select" name="gender" id="gender" required>
                 <option value="">Gender</option>
                 <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
@@ -280,26 +277,17 @@
             </div>
           </form>
 
-
           <div class="mb-4">
-          <form action="{{ url_for('logout') }}" method="POST">
-            <button type="submit" class="btn btn-outline-danger w-100">Logout</button>
-        </form>
-      </div>
+            <form action="{{ url_for('logout') }}" method="POST">
+              <button type="submit" class="btn btn-outline-danger w-100">Logout</button>
+            </form>
+          </div>
         
-      <div class="mb-4">
-        <form action="{{ url_for('update_password') }}" method="POST">
-          <button type="submit" class="btn btn-outline-primary w-100">Update Password</button>
-      </form>
-      </div>
-
-
-          
-
-          
-
-
-
+          <div class="mb-4">
+            <form action="{{ url_for('update_password') }}" method="POST">
+              <button type="submit" class="btn btn-outline-primary w-100">Update Password</button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -329,7 +317,6 @@
         btn.classList.remove('shake-light', 'shake-medium', 'shake-hard');
       });
 
-      // Random message logic
       const messages = [
         "Fuel your goals!",
         "Health starts here!",
@@ -353,12 +340,6 @@
       document.querySelectorAll("input").forEach(input => {
         toggleLabel(input);
       });
-
-
-
     </script>
-
-
-    
   </body>
 {% endblock %}
