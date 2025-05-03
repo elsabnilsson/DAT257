@@ -122,14 +122,29 @@
 
         {% if water_intake %}
         <div class="mb-5">
-          <h6 style="font-size: 0.8em;">That's about this many glasses of water:</h6>
-          {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
-          <div style="display: flex; flex-wrap: wrap; justify-content: center;">
-            {% for i in range(glasses_count) %}
-              <div style="display: flex; justify-content: center; margin-top: -12px;">
-                <img src="{{ url_for('static', filename='glassofwater_color.png') }}" alt="Glass" style="width: 50px; height: 45px;">
-              </div>
-            {% endfor %}
+          <h6 style="font-size: 0.8em;">That's about this many glasses of water. Track your daily consumption and aim to fill all glasses!</h6>
+            {% set glasses_count = (water_intake / 0.25) | round(0, 'ceil') | int %}
+            <div 
+              style="display: flex; flex-wrap: wrap; justify-content: left; width: 100%; margin-top: -3px; margin-bottom: -5px;"
+              title="Each glass represents 0.25 liters of water — Total: {{ glasses_count }} glasses">
+              {% for i in range(glasses_count) %}
+              <div style="width: 12.5%; display: flex; justify-content: center; margin-top: -12px;">
+                <img src="{{ url_for('static', filename='glassofwater_' + ('filled' if i < water_glasses else 'empty') + '.png') }}" 
+                  alt="Glass" style="width: 60px; height: 55px;">
+               </div>
+              {% endfor %}
+            </div>
+            
+          <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <form method="get" action="{{ url_for('stats') }}" style="flex: 1; max-width: 180px;">
+              <button type="submit" name="click_glass" value="1" class="glass-button"
+              {% if water_glasses >= glasses_count %} disabled {% endif %}>
+              Add drunken glass</button>
+            </form>
+          
+            <form method="post" action="{{ url_for('remove_water_glass') }}" style="flex: 1; max-width: 180px;">
+              <button type="submit" class="glass-button">Remove drunken glass</button>
+            </form>
           </div>
         </div>
         {% endif %}
@@ -166,26 +181,6 @@
             </div>
           </div>
         </div>
-
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-          <form method="get" action="{{ url_for('stats') }}" style="flex: 1; max-width: 180px;">
-            <button type="submit" name="click_glass" value="1" class="glass-button"
-            {% if water_glasses >= glasses_count %} disabled {% endif %}>
-            Add drunken glass</button>
-          </form>
-        
-          <form method="post" action="{{ url_for('remove_water_glass') }}" style="flex: 1; max-width: 180px;">
-            <button type="submit" class="glass-button">Remove drunken glass</button>
-          </form>
-        </div>
-        
-
-        {% if protein and fat and carbs %}
-          <div class="mt-5" style="max-width: 500px; margin: auto;">
-            <h5 class="text-center">Macronutrient Distribution</h5>
-            <canvas id="macroChart"></canvas>
-          </div>
-        {% endif %}
 
         <div class="mb-5">
           <h5 class="text-center">Weight Over Time</h5>
@@ -227,43 +222,9 @@
               }
             });
           </script>
-        {% endif %}
+        
       {% endif %}
 
-      {% if meal_plan %}
-        <div class="container mt-5">
-          <div style="padding-bottom: 0%; font-size: 16pt;">
-            <h2>Suggested Meal Split</h2>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Meal</th>
-                  <th>Calories</th>
-                  <th>Protein (g)</th>
-                  <th>Fat (g)</th>
-                  <th>Carbs (g)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for meal, macros in meal_plan.items() %}
-                  <tr>
-                    <td>{{ meal }}</td>
-                    <td>{{ macros.calories }}</td>
-                    <td>{{ macros.protein }}</td>
-                    <td>{{ macros.fat }}</td>
-                    <td>{{ macros.carbs }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      {% endif %}
-
-      <div class="mt-5" style="max-width: 600px; margin: auto;">
-        <h5 class="text-center">Weight Over Time</h5>
-        <canvas id="weightChart" width="400" height="200"></canvas>
-      </div>
       
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       
