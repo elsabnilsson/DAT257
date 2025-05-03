@@ -14,4 +14,4 @@ class BodyAge:
         else:  # BMI ≥ 30
             adjustment = 3
 
-        return max(0, round(person.age + adjustment))
+        return max(0, round(person.get_age() + adjustment))

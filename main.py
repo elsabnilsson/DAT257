@@ -41,23 +41,23 @@ def nocache(view):
 @app.route("/register", methods=["GET", "POST"])
 def register():
    
-    age = height = weight = activity = gender = ""
+    dob = height = weight = activity = gender = ""
 
 
     if request.method == "POST":
-        age_input = request.form.get("age", "")
+        dob_input = request.form.get("dob", "")
         height_input = request.form.get("height", "")
         weight_input = request.form.get("weight", "")
         activity = request.form.get("activity", "active")
         gender = request.form.get("gender", "other")
 
         try:
-            age = int(age_input)
+            dob = datetime.strptime(dob_input, "%Y-%m-%d").date()
             height = float(height_input) / 100
             weight = float(weight_input)
 
             # Store these values temporarily in session
-            session["age"] = age
+            session["dob"] = dob.isoformat()
             session["height"] = height
             session["weight"] = weight
             session["activity"] = activity
@@ -69,7 +69,7 @@ def register():
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
-    return render_template("register.html", current_route=request.endpoint, age=age, height=height, weight=weight, activity=activity, gender=gender)
+    return render_template("register.html", current_route=request.endpoint, dob="", height=height, weight=weight, activity=activity, gender=gender)
 
 @app.route("/set_password", methods=["GET", "POST"])
 def set_password():
@@ -79,7 +79,7 @@ def set_password():
         password = request.form["password"]
 
         # Retrieve profile info from session
-        age = session.get("age")
+        dob = datetime.fromisoformat(session.get("dob"))
         height = session.get("height")
         weight = session.get("weight")
         activity = session.get("activity")
@@ -93,7 +93,7 @@ def set_password():
             user_ref = db.collection("users").document(user.uid)
             user_ref.set({
                 "email": email,
-                "age": age,
+                "dob": dob.isoformat(),
                 "height": height,
                 "weight": weight,
                 "activity": activity,
@@ -139,12 +139,13 @@ def login():
             # Fetch user data from Firestore
             user_ref = db.collection("users").document(data["localId"])
             user_data = user_ref.get()
-
+            
             if user_data.exists:
                 user_info = user_data.to_dict()
+                dob = datetime.fromisoformat(user_info["dob"])
 
                 # Set session variables for the stats page
-                session["age"] = user_info["age"]
+                session["dob"] = user_info["dob"]
                 session["height"] = user_info["height"]
                 session["weight"] = user_info["weight"]
                 session["activity"] = user_info["activity"]
@@ -153,7 +154,7 @@ def login():
                 weight_log = user_info.get("weight_log", [])
                 weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
     
-                person = Person(session["age"], session["height"], session["weight"], session["gender"])
+                person = Person(session["dob"], session["height"], session["weight"], session["gender"])
                 bmi = person.calculate_bmi()
                 body_age = BodyAge().calculate(person)
 
@@ -197,9 +198,10 @@ def profile():
     if request.method == "POST":
         try:
             # Fetch updated values from form
+            dob_input = request.form.get("dob", "")
             weight = float(request.form.get("weight", ""))
             activity = request.form.get("activity", "active")
-            age = int(request.form.get("age", ""))
+            dob = datetime.strptime(dob_input, "%Y-%m-%d").date()
             height = float(request.form.get("height", "")) / 100
             gender = request.form.get("gender", "other")
 
@@ -222,13 +224,12 @@ def profile():
 
             # Update Firestore with the new weight, activity, and cleaned log
             user_ref.update({
-                "age": age,
+                "dob": dob.isoformat(),
                 "height": height,
                 "gender": gender,
                 "weight": weight,
                 "activity": activity,
                 "weight_log": updated_log
-            
             })
 
 
@@ -242,7 +243,7 @@ def profile():
         return "User profile not found", 404
 
     user_info = user_data.to_dict()
-    age = user_info["age"]
+    dob = datetime.fromisoformat(user_info["dob"])
     height = user_info["height"]
     weight = user_info["weight"]
     activity = user_info["activity"]
@@ -250,7 +251,7 @@ def profile():
 
     return render_template(
         "index.html",
-        age=age,
+        dob = dob.isoformat(),
         height=height * 100,
         weight=weight,
         activity=activity,
@@ -271,7 +272,6 @@ def stats():
         return "User profile not found", 404
 
     user_info = user_data.to_dict()
-    age = user_info["age"]
     height = user_info["height"]
     weight = user_info["weight"]
     activity = user_info["activity"]
@@ -279,7 +279,10 @@ def stats():
     
         
     # Now calculate the BMI, body age, etc.
-    person = Person(age, height, weight, gender)
+    
+    dob = datetime.fromisoformat(user_info["dob"])
+    person = Person(dob, height, weight, gender)
+
     bmi = person.calculate_bmi()
     body_age = BodyAge().calculate(person)
 
@@ -440,7 +443,8 @@ def workouts():
         return "User not found", 404
 
     user = user_ref.to_dict()
-    person = Person(user["age"], user["height"], user["weight"], user["gender"])
+    dob = datetime.fromisoformat(user["dob"])
+    person = Person(dob, user["height"], user["weight"], user["gender"])
 
     if body_part:
         try:
