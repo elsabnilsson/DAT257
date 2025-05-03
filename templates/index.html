@@ -1,162 +1,138 @@
 {% extends "base.html" %}
 {% block title %}Snackrobat{% endblock %}
 {% block content %}
-    <style>
-      .btn-check:checked + .btn,
-      .btn-check:focus + .btn {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-      }
-      .btn-check:not(:checked) + .btn {
-        border-color: #bbb;
-        color: #433118;
-      }
-      .btn-check:not(:checked) + .btn:hover {
-        border-color: #433118;
-        color: #433118;
-        background-color: rgba(67, 49, 24, 0.05);
-      }
+  <style>
+    .btn-check:checked + .btn,
+    .btn-check:focus + .btn {
+      border-color: #433118;
+      background-color: #433118;
+      color: white;
+    }
+    .btn-check:not(:checked) + .btn {
+      border-color: #bbb;
+      color: #433118;
+    }
+    .btn-check:not(:checked) + .btn:hover {
+      border-color: #433118;
+      color: #433118;
+      background-color: rgba(67, 49, 24, 0.05);
+    }
 
-      .btn-calculate {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-      }
+    .btn-calculate {
+      border-color: #433118;
+      background-color: #433118;
+      color: white;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
 
-      @keyframes shake-light {
-        0%, 100% { transform: scale(1); }
-        25% { transform: scale(1.05); }
-        75% { transform: scale(0.95); }
-      }
+    .btn-inverted-hover {
+      color: white;
+      transition: background-color 0.3s, border 0.3s, color 0.3s;
+    }
 
-      @keyframes shake-medium {
-        0%, 100% { transform: scale(1); }
-        20% { transform: scale(1.1); }
-        80% { transform: scale(0.9); }
-      }
+    .btn-inverted-hover:hover {
+      background-color: transparent !important;
+      border: 2px solid currentColor !important;
+      color: inherit !important;
+    }
 
-      @keyframes shake-hard {
-        0%, 100% { transform: scale(1); }
-        15% { transform: scale(1.2); }
-        85% { transform: scale(0.8); }
-      }
+    @keyframes shake-light {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.05); }
+      75% { transform: scale(0.95); }
+    }
 
-      .shake-light:hover {
-        animation: shake-light 0.3s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    @keyframes shake-medium {
+      0%, 100% { transform: scale(1); }
+      20% { transform: scale(1.1); }
+      80% { transform: scale(0.9); }
+    }
 
-      .shake-medium:hover {
-        animation: shake-medium 0.2s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    @keyframes shake-hard {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.2); }
+      85% { transform: scale(0.8); }
+    }
 
-      .shake-hard:hover {
-        animation: shake-hard 0.15s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    .shake-light:hover {
+      animation: shake-light 0.3s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .btn-calculate:active {
-        transform: scale(0.95);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        background-color: white;
-        color: #433118;
-      }
+    .shake-medium:hover {
+      animation: shake-medium 0.2s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .input-wrapper {
-        position: relative;
-      }
+    .shake-hard:hover {
+      animation: shake-hard 0.15s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .input-label-right {
-        position: absolute;
-        right: 34px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
-        font-size: 0.9rem;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        opacity: 0;
-      }
+    .btn-calculate:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      color: #433118;
+    }
 
-      .tooltip-asterisk {
-        display: inline-block;
-        position: relative;
-        color: #888;
-        cursor: help;
-        margin-left: 4px;
-      }
+    .input-wrapper {
+      position: relative;
+    }
 
-      .tooltip-asterisk:hover + .tooltip-text {
-        display: inline-block;
-      }
+    .input-label-right {
+      position: absolute;
+      right: 34px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.9rem;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
 
-      .tooltip-text {
-        display: none;
-        position: absolute;
-        background-color: #333;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 5px;
-        top: -5px;
-        left: 20px;
-        z-index: 1000;
-        font-size: 0.85rem;
-        white-space: normal;     
-        max-width: 250px;        
-        text-align: left;        
-      }
+    .tooltip-asterisk {
+      display: inline-block;
+      position: relative;
+      color: #888;
+      cursor: help;
+      margin-left: 4px;
+    }
 
-      input[readonly], select[disabled] {
-        background-color: #f0f0f0;
-        color: #888;
-        border-color: #ddd;
-        pointer-events: none;
-      }
+    .tooltip-asterisk:hover + .tooltip-text {
+      display: inline-block;
+    }
 
-      /* Modal Styles */
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-      }
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      background-color: #333;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 5px;
+      top: -5px;
+      left: 20px;
+      z-index: 1000;
+      font-size: 0.85rem;
+      white-space: normal;
+      max-width: 250px;
+      text-align: left;
+    }
 
-      .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 300px;
-      }
-
-      .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-      }
-
-      .close:hover,
-      .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-      }
-    </style>
+    input[readonly], select[disabled] {
+      background-color: #f0f0f0;
+      color: #888;
+      border-color: #ddd;
+      pointer-events: none;
+    }
+  </style>
 
   <body style="background-color: #f7e5c1;">
     <div class="container mt-5" style="text-align: center;">
@@ -183,18 +159,7 @@
         <div class="col-md-4" style="display: block; margin-left: auto; margin-right: auto;">
           <form method="post">
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%;">
-              <input
-                type="number"
-                class="form-control"
-                name="age"
-                id="age"
-                value="{{ age }}"
-                placeholder="Age"
-                required
-                min="18"
-                max="100"
-                oninput="toggleLabel(this)"
-              />
+              <input type="number" class="form-control" name="age" id="age" value="{{ age }}" placeholder="Age" required min="18" max="100" oninput="toggleLabel(this)" />
               <span class="input-label-right" id="label-age">Age</span>
             </div>
 
@@ -208,35 +173,12 @@
             </div>
 
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%;">
-              <input
-                type="number"
-                class="form-control"
-                name="height"
-                id="height"
-                value="{{ height }}"
-                placeholder="Height (cm)"
-                required
-                step="0.1"
-                min="120"
-                max="250"
-                oninput="toggleLabel(this)"
-              />
+              <input type="number" class="form-control" name="height" id="height" value="{{ height }}" placeholder="Height (cm)" required step="0.1" min="120" max="250" oninput="toggleLabel(this)" />
               <span class="input-label-right" id="label-height">Height (cm)</span>
             </div>
 
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%;">
-              <input
-                type="number"
-                class="form-control"
-                name="weight"
-                id="weight"
-                value="{{ weight }}"
-                placeholder="Weight (kg)"
-                required
-                step="0.1"
-                min="30"
-                max="300"
-              />
+              <input type="number" class="form-control" name="weight" id="weight" value="{{ weight }}" placeholder="Weight (kg)" required step="0.1" min="30" max="300" />
               <span class="input-label-right" id="label-weight">Weight (kg)</span>
             </div>
 
@@ -248,28 +190,13 @@
                   'moderate': 'Lightly active: moderate exercise or daily activity (factor 1.45)',
                   'active': 'Active: intensive exercise or physically demanding activity (factor 1.7)'
                 } %}
-                
                 <div class="btn-group w-100" role="group" aria-label="Activity level buttons">
                   {% for level in ['inactive', 'moderate', 'active'] %}
-                    <input 
-                      type="radio" 
-                      class="btn-check" 
-                      name="activity" 
-                      id="activity-{{ level }}" 
-                      value="{{ level }}"
-                      {% if activity == level %}checked{% endif %}
-                      required
-                      autocomplete="off"
-                    >
-                    <label 
-                      class="btn btn-outline-primary text-capitalize" 
-                      for="activity-{{ level }}"
-                      title="{{ explanations[level] }}"
-                    >
-                      {{ level }}
-                    </label>
+                    <input type="radio" class="btn-check" name="activity" id="activity-{{ level }}" value="{{ level }}" {% if activity == level %}checked{% endif %} required autocomplete="off">
+                    <label class="btn btn-outline-primary text-capitalize" for="activity-{{ level }}" title="{{ explanations[level] }}">{{ level }}</label>
                   {% endfor %}
                 </div>
+              </div>
             </div>
 
             <div class="mb-4">
@@ -279,13 +206,13 @@
 
           <div class="mb-4">
             <form action="{{ url_for('logout') }}" method="POST">
-              <button type="submit" class="btn btn-outline-danger w-100">Logout</button>
+              <button type="submit" class="btn btn-danger w-100 btn-inverted-hover">Logout</button>
             </form>
           </div>
-        
+
           <div class="mb-4">
             <form action="{{ url_for('update_password') }}" method="POST">
-              <button type="submit" class="btn btn-outline-primary w-100">Update Password</button>
+              <button type="submit" class="btn btn-primary w-100 btn-inverted-hover">Update Password</button>
             </form>
           </div>
         </div>
