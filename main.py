@@ -154,7 +154,9 @@ def login():
                 weight_log = user_info.get("weight_log", [])
                 weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
     
-                person = Person(session["dob"], session["height"], session["weight"], session["gender"])
+                dob = datetime.fromisoformat(session["dob"])
+                person = Person(dob, session["height"], session["weight"], session["gender"])
+
                 bmi = person.calculate_bmi()
                 body_age = BodyAge().calculate(person)
 
