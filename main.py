@@ -69,7 +69,7 @@ def register():
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
-    return render_template("register.html", current_route=request.endpoint, dob="", height=height, weight=weight, activity=activity, gender=gender)
+    return render_template("register.html", current_route=request.endpoint, dob=dob, height=height, weight=weight, activity=activity, gender=gender)
 
 @app.route("/set_password", methods=["GET", "POST"])
 def set_password():
@@ -245,7 +245,7 @@ def profile():
         return "User profile not found", 404
 
     user_info = user_data.to_dict()
-    dob = datetime.fromisoformat(user_info["dob"])
+    dob = datetime.fromisoformat(user_info["dob"]).date()
     height = user_info["height"]
     weight = user_info["weight"]
     activity = user_info["activity"]
@@ -282,7 +282,7 @@ def stats():
         
     # Now calculate the BMI, body age, etc.
     
-    dob = datetime.fromisoformat(user_info["dob"])
+    dob = datetime.fromisoformat(user_info["dob"]).date()
     person = Person(dob, height, weight, gender)
 
     bmi = person.calculate_bmi()
@@ -445,7 +445,7 @@ def workouts():
         return "User not found", 404
 
     user = user_ref.to_dict()
-    dob = datetime.fromisoformat(user["dob"])
+    dob = datetime.fromisoformat(user["dob"]).date()
     person = Person(dob, user["height"], user["weight"], user["gender"])
 
     if body_part:
