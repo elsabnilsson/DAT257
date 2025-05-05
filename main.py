@@ -41,7 +41,7 @@ def nocache(view):
 @app.route("/register", methods=["GET", "POST"])
 def register():
    
-    dob = height = weight = activity = gender = ""
+    dob = height = weight = activity = gender = goal_weight = ""
 
 
     if request.method == "POST":
@@ -50,11 +50,15 @@ def register():
         weight_input = request.form.get("weight", "")
         activity = request.form.get("activity", "active")
         gender = request.form.get("gender", "other")
+        goal_weight_input = request.form.get("goal_weight", "")
+        
 
         try:
             dob = datetime.strptime(dob_input, "%Y-%m-%d").date()
             height = float(height_input) / 100
             weight = float(weight_input)
+            
+            goal_weight = float(goal_weight_input) if goal_weight_input else None
 
             # Store these values temporarily in session
             session["dob"] = dob.isoformat()
@@ -62,6 +66,7 @@ def register():
             session["weight"] = weight
             session["activity"] = activity
             session["gender"] = gender
+            session["goal_weight"] = goal_weight
 
             # Proceed to password creation page
             return redirect(url_for("set_password"))
@@ -69,7 +74,7 @@ def register():
         except ValueError:
             return "Invalid input. Please enter valid numbers."
 
-    return render_template("register.html", current_route=request.endpoint, dob=dob, height=height, weight=weight, activity=activity, gender=gender)
+    return render_template("register.html", current_route=request.endpoint, dob=dob, height=height, weight=weight, activity=activity, gender=gender, goal_weight=goal_weight)
 
 @app.route("/set_password", methods=["GET", "POST"])
 def set_password():
@@ -84,6 +89,7 @@ def set_password():
         weight = session.get("weight")
         activity = session.get("activity")
         gender = session.get("gender")
+        goal_weight = session.get("goal_weight")
 
         try:
             # Create user in Firebase Authentication
@@ -98,6 +104,7 @@ def set_password():
                 "weight": weight,
                 "activity": activity,
                 "gender": gender,
+                "goal_weight": goal_weight,
             })
 
             session["user_uid"] = user.uid  # <- This line makes them "logged in"
@@ -150,12 +157,13 @@ def login():
                 session["weight"] = user_info["weight"]
                 session["activity"] = user_info["activity"]
                 session["gender"] = user_info["gender"]
+                session["goal_weight"] = user_info["goal_weight"]
 
                 weight_log = user_info.get("weight_log", [])
                 weight_log = sorted(weight_log, key=lambda x: x["timestamp"])
     
                 dob = datetime.fromisoformat(session["dob"])
-                person = Person(dob, session["height"], session["weight"], session["gender"])
+                person = Person(dob, session["height"], session["weight"], session["gender"], session["goal_weight"])
 
                 bmi = person.calculate_bmi()
                 body_age = BodyAge().calculate(person)
@@ -206,6 +214,7 @@ def profile():
             dob = datetime.strptime(dob_input, "%Y-%m-%d").date()
             height = float(request.form.get("height", "")) / 100
             gender = request.form.get("gender", "other")
+            goal_weight = float(request.form.get("goal_weight", "")) if request.form.get("goal_weight") else None
 
             # Fetch the existing weight log
             user_doc = user_ref.get()
@@ -231,7 +240,8 @@ def profile():
                 "gender": gender,
                 "weight": weight,
                 "activity": activity,
-                "weight_log": updated_log
+                "weight_log": updated_log,
+                "goal_weight": goal_weight
             })
 
 
@@ -250,6 +260,7 @@ def profile():
     weight = user_info["weight"]
     activity = user_info["activity"]
     gender = user_info["gender"]
+    goal_weight = user_info["goal_weight"]
 
     return render_template(
         "index.html",
@@ -258,6 +269,7 @@ def profile():
         weight=weight,
         activity=activity,
         gender=gender,
+        goal_weight=goal_weight,
     )
 
 @app.route("/stats", methods=["GET", "POST"])
@@ -278,12 +290,13 @@ def stats():
     weight = user_info["weight"]
     activity = user_info["activity"]
     gender = user_info["gender"]
+    goal_weight = user_info["goal_weight"]
     
         
     # Now calculate the BMI, body age, etc.
     
     dob = datetime.fromisoformat(user_info["dob"]).date()
-    person = Person(dob, height, weight, gender)
+    person = Person(dob, height, weight, gender, goal_weight)
 
     bmi = person.calculate_bmi()
     body_age = BodyAge().calculate(person)
@@ -446,7 +459,7 @@ def workouts():
 
     user = user_ref.to_dict()
     dob = datetime.fromisoformat(user["dob"]).date()
-    person = Person(dob, user["height"], user["weight"], user["gender"])
+    person = Person(dob, user["height"], user["weight"], user["gender"], user["goal_weight"])
 
     if body_part:
         try:

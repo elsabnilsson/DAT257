@@ -193,6 +193,7 @@
                 step="0.1"
                 min="30"
                 max="300"
+                oninput="toggleLabel(this)"
               />
               <span class="input-label-right" id="label-weight">Weight (kg)</span>
             </div>
@@ -227,6 +228,16 @@
                     </label>
                   {% endfor %}
                 </div>
+            </div>
+
+            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 3%;">
+              <div style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                <label for="goal_weight" class="input-label-left" id="label-weight">Goal Weight (optional):</label>
+                <input type="number" class="form-control" name="goal_weight" id="goal_weight" 
+                      placeholder="Goal Weight (kg)" step="0.1" value="{{ goal_weight }}"
+                       min="30" max="300" style="flex: 1;" oninput="toggleLabel(this)" />
+                       <span class="input-label-right" id="label-goal_weight">Goal Weight (kg)</span>
+              </div>
             </div>
 
             <div class="mb-4">
