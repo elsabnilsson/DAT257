@@ -230,9 +230,16 @@
       
       <script>
         const weightLog = {{ weight_log | tojson }};
+        const goalWeight = {{ goal_weight | default(0) }};
+        currentWeight = {{ current_weight | default(0) }};
+
         const dates = weightLog.map(entry => new Date(entry.timestamp).toLocaleDateString());
         const weights = weightLog.map(entry => entry.weight);
+        const goalWeights = Array(dates.length).fill(goalWeight);
       
+        const yMax = Math.max(...weights, goalWeight) + 5;
+        const yMin = Math.min(...weights, goalWeight) - 5;
+
         const ctxWeight = document.getElementById('weightChart').getContext('2d');
         new Chart(ctxWeight, {
           type: 'line',
@@ -247,13 +254,25 @@
               fill: true,
               pointRadius: 5,
               pointHoverRadius: 7
-            }]
+            },
+          {
+              label: 'Goal Weight (kg)',
+              data: goalWeights,
+              borderColor: '#FF5733',
+              backgroundColor: 'rgba(255, 87, 51, 0.2)',
+              tension: 0,
+              fill: false,
+              pointRadius: 0,
+              borderDash: [6, 6]
+          }
+          ]
           },
           options: {
             responsive: true,
             scales: {
               y: {
-                beginAtZero: false,
+                min: yMin,
+                max: yMax,
                 title: {
                   display: true,
                   text: 'Weight (kg)'
