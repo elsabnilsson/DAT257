@@ -151,7 +151,10 @@
             text-align: center;
           "></div>
 
-          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
+          <img src="{{ url_for('static', filename='Snacky birthday.png') if is_birthday else url_for('static', filename='logo.jpg') }}" 
+          alt="logo" 
+          class="col-md-2" 
+          style="display: block; margin-left: auto; margin-right: auto;">
         </div>
       </div>
 
