@@ -313,19 +313,17 @@
       const labels = waterData.map(entry => entry.date);
       const glasses = waterData.map(entry => entry.glasses);
 
+
       const ctxWater = document.getElementById('waterChart').getContext('2d');
-      const waterChart = new Chart(ctxWater, {
-        type: 'line',
+      new Chart(ctxWater, {
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
                 label: 'Water Intake (glasses)',
                 data: glasses,
                 borderColor: '#5D7A3A',
-                backgroundColor: 'rgba(93, 122, 58, 0.2)',
-                fill: true,
-                tension: 0.3,
-                pointRadius: 5
+                backgroundColor: 'rgba(93, 122, 58, 0.2)'
             }]
         },
         options: {
@@ -340,6 +338,9 @@
                     title: { display: true,
                     text: 'Date' }
                 }
+            },
+            plugins: {
+                legend: { display: false },
             }
         }
     });
