@@ -1,120 +1,119 @@
 {% extends "base.html" %}
 {% block content %}
-    <style>
-      .btn-check:checked + .btn,
-      .btn-check:focus + .btn {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-      }
-      .btn-check:not(:checked) + .btn {
-        border-color: #bbb;
-        color: #433118;
-      }
-      .btn-check:not(:checked) + .btn:hover {
-        border-color: #433118;
-        color: #433118;
-        background-color: rgba(67, 49, 24, 0.05);
-      }
+  <style>
+    .btn-check:checked + .btn,
+    .btn-check:focus + .btn {
+      border-color: #433118;
+      background-color: #433118;
+      color: white;
+    }
+    .btn-check:not(:checked) + .btn {
+      border-color: #bbb;
+      color: #433118;
+    }
+    .btn-check:not(:checked) + .btn:hover {
+      border-color: #433118;
+      color: #433118;
+      background-color: rgba(67, 49, 24, 0.05);
+    }
 
-      .btn-calculate {
-        border-color: #433118;
-        background-color: #433118;
-        color: white;
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-      }
+    .btn-calculate {
+      border-color: #433118;
+      background-color: #433118;
+      color: white;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
 
-      @keyframes shake-light {
-        0%, 100% { transform: scale(1); }
-        25% { transform: scale(1.05); }
-        75% { transform: scale(0.95); }
-      }
+    @keyframes shake-light {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.05); }
+      75% { transform: scale(0.95); }
+    }
 
-      @keyframes shake-medium {
-        0%, 100% { transform: scale(1); }
-        20% { transform: scale(1.1); }
-        80% { transform: scale(0.9); }
-      }
+    @keyframes shake-medium {
+      0%, 100% { transform: scale(1); }
+      20% { transform: scale(1.1); }
+      80% { transform: scale(0.9); }
+    }
 
-      @keyframes shake-hard {
-        0%, 100% { transform: scale(1); }
-        15% { transform: scale(1.2); }
-        85% { transform: scale(0.8); }
-      }
+    @keyframes shake-hard {
+      0%, 100% { transform: scale(1); }
+      15% { transform: scale(1.2); }
+      85% { transform: scale(0.8); }
+    }
 
-      .shake-light:hover {
-        animation: shake-light 0.3s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    .shake-light:hover {
+      animation: shake-light 0.3s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .shake-medium:hover {
-        animation: shake-medium 0.2s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    .shake-medium:hover {
+      animation: shake-medium 0.2s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .shake-hard:hover {
-        animation: shake-hard 0.15s infinite;
-        background-color: #5D7A3A;
-        border-color: #5D7A3A;
-        color: white;
-      }
+    .shake-hard:hover {
+      animation: shake-hard 0.15s infinite;
+      background-color: #5D7A3A;
+      border-color: #5D7A3A;
+      color: white;
+    }
 
-      .btn-calculate:active {
-        transform: scale(0.95);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        background-color: white;
-        color: #433118;
-      }
+    .btn-calculate:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      color: #433118;
+    }
 
-      .input-wrapper {
-        position: relative;
-      }
+    .input-wrapper {
+      position: relative;
+    }
 
-      .input-label-right {
-        position: absolute;
-        right: 34px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
-        font-size: 0.9rem;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        opacity: 0;
-      }
+    .input-label-right {
+      position: absolute;
+      right: 34px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 0.9rem;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
 
-      .tooltip-asterisk {
-        display: inline-block;
-        position: relative;
-        color: #888;
-        cursor: help;
-        margin-left: 4px;
-      }
+    .tooltip-asterisk {
+      display: inline-block;
+      position: relative;
+      color: #888;
+      cursor: help;
+      margin-left: 4px;
+    }
 
-      .tooltip-asterisk:hover + .tooltip-text {
-        display: inline-block;
-      }
+    .tooltip-asterisk:hover + .tooltip-text {
+      display: inline-block;
+    }
 
-      .tooltip-text {
-        display: none;
-        position: absolute;
-        background-color: #333;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 5px;
-        top: -5px;
-        left: 20px;
-        z-index: 1000;
-        font-size: 0.85rem;
-        white-space: normal;     
-        max-width: 250px;        
-        text-align: left;        
-      }
-
-    </style>
+    .tooltip-text {
+      display: none;
+      position: absolute;
+      background-color: #333;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 5px;
+      top: -5px;
+      left: 20px;
+      z-index: 1000;
+      font-size: 0.85rem;
+      white-space: normal;     
+      max-width: 250px;        
+      text-align: left;        
+    }
+  </style>
 
   <body style="background-color: #f7e5c1;">
     <div class="container mt-5" style="text-align: center;">
@@ -133,7 +132,8 @@
             text-align: center;
           "></div>
 
-          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2" style="display: block; margin-left: auto; margin-right: auto;">
+          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo"
+               class="img-fluid mx-auto d-block" style="max-width: 150px;">
         </div>
       </div>
 
@@ -154,48 +154,35 @@
             </div>
 
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%;">
-                <input
-                  type="password"
-                  class="form-control"
-                  name="password"
-                  id="password"
-                  placeholder="Password"
-                  required
-                  minlength="6"
-                  oninput="toggleLabel(this)"
-                />
-                <span class="input-label-right" id="label-age">Password</span>
-              </div>
-
-              <div class="mb-4" style="padding-top: 3%;">
-                <input type="submit" class="btn btn-calculate w-100 shake-light" value="Login" />
-              </div>
-            </form>
-
-
-
-
-
-    <p> <a href="{{ url_for('register') }}">Create an account</a></p>
-    <p> <a href="{{ url_for('change_password') }}">Forgot your password?</a></p>
-
-
-
-    {% if error %}
-    <div class="alert alert-danger" role="alert">
-      {{ error }}
-    </div>
-  {% endif %}
-
-            
+              <input
+                type="password"
+                class="form-control"
+                name="password"
+                id="password"
+                placeholder="Password"
+                required
+                minlength="6"
+                oninput="toggleLabel(this)"
+              />
+              <span class="input-label-right" id="label-age">Password</span>
             </div>
 
+            <div class="mb-4" style="padding-top: 3%;">
+              <input type="submit" class="btn btn-calculate w-100 shake-light" value="Login" />
+            </div>
+          </form>
 
+          <p><a href="{{ url_for('register') }}">Create an account</a></p>
+          <p><a href="{{ url_for('change_password') }}">Forgot your password?</a></p>
 
-
+          {% if error %}
+            <div class="alert alert-danger" role="alert">
+              {{ error }}
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
-
 
     <script>
       const btn = document.querySelector('.btn-calculate');
@@ -230,9 +217,6 @@
           label.style.opacity = 0;
         }
       }
-
-      
     </script>
-
   </body>
-  {% endblock %}
+{% endblock %}

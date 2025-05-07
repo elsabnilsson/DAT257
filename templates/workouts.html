@@ -20,6 +20,16 @@
     </div>
   </form>
 
+  {% if advice %}
+  <div class="mt-4 mb-4 text-center w-100 w-md-75 w-lg-50 mx-auto text-light p-3 rounded" style="background-color: #433118; font-size: 1rem;">
+    {{ advice }}
+  </div>
+  {% endif %}
+
+
+
+
+
   {% if exercises %}
     <div class="row g-4">
       {% for ex in exercises %}
