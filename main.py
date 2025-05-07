@@ -372,7 +372,9 @@ def stats():
         body_age=body_age,
         weight_log=weight_log,
         water_glasses=session.get("water_glasses", 0),
-        water_log=session.get("water_log", [])
+        water_log=session.get("water_log", []),
+        goal_weight=goal_weight,
+        weight=weight
     )
 
 
