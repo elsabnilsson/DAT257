@@ -347,6 +347,10 @@ def stats():
         session["water_glasses"] = 0
         session["water_date"] = current_date
 
+    percent_water = session["water_glasses"] * 0.25 / water_intake if water_intake else 0
+    session["show_water_logo"] = percent_water >= 0.9
+
+
     #if request.args.get('click_glass'):
      #   session["water_glasses"] += 1
 
