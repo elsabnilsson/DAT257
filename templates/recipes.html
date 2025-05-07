@@ -66,6 +66,34 @@
     }
     .detail-card.open { max-height: 1000px; }
 
+    /* Vegetarian icon tooltip styling */
+    .veg-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+    .veg-wrapper .veg-icon {
+      font-size: 1rem;
+      color: #5D7A3A;
+      vertical-align: middle;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .veg-wrapper:hover::after {
+      content: "Vegetarian";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-4px);
+      background: rgba(0, 0, 0, 0.75);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      z-index: 10;
+    }
+
     /* Image styling within detail-card */
     .detail-card .col-8 img {
       width: 100%;
@@ -135,7 +163,14 @@
           {% for r in recipes.results %}
             <div class="result-card">
               <div class="result-title">
-                <span>{{ r.title }}</span>
+                <span>
+                  {% if r.vegetarian or ('vegetarian' in r.diets) %}
+                    <span class="veg-wrapper">
+                      <i class="material-icons veg-icon">eco</i>
+                    </span>
+                  {% endif %}
+                  {{ r.title }}
+                </span>
                 <span class="arrow">▲</span>
               </div>
               <div class="detail-card card p-0">
