@@ -73,8 +73,14 @@ def register():
             
         except ValueError:
             return "Invalid input. Please enter valid numbers."
+    
+    dob_str = session.get("dob")
+    is_birthday = False
+    if dob_str:
+        dob = datetime.fromisoformat(dob_str).date()
+        is_birthday = is_user_birthday(dob)
 
-    return render_template("register.html", current_route=request.endpoint, dob=dob, height=height, weight=weight, activity=activity, gender=gender, goal_weight=goal_weight)
+    return render_template("register.html", current_route=request.endpoint, dob=dob, height=height, weight=weight, activity=activity, gender=gender, goal_weight=goal_weight, is_birthday=is_birthday)
 
 @app.route("/set_password", methods=["GET", "POST"])
 def set_password():
@@ -117,7 +123,13 @@ def set_password():
             # Handle other request exceptions
             error = f"An error occurred: {str(e)}"
 
-    return render_template("set_password.html", error=error, current_route=request.endpoint)
+    dob_str = session.get("dob")
+    is_birthday = False
+    if dob_str:
+        dob = datetime.fromisoformat(dob_str).date()
+        is_birthday = is_user_birthday(dob)
+
+    return render_template("set_password.html", error=error, current_route=request.endpoint, is_birthday=is_birthday)
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -193,7 +205,14 @@ def login():
         except requests.exceptions.RequestException:
             error = "Wrong email or password."
 
-    return render_template("login.html", error=error, current_route=request.endpoint)
+    dob_str = session.get("dob")
+    is_birthday = False
+    if dob_str:
+        dob = datetime.fromisoformat(dob_str).date()
+        is_birthday = is_user_birthday(dob)
+
+    return render_template("login.html", error=error, current_route=request.endpoint, is_birthday=is_birthday)
+
 
 
 @app.route("/profile", methods=["GET", "POST"])
@@ -262,6 +281,12 @@ def profile():
     gender = user_info["gender"]
     goal_weight = user_info["goal_weight"]
 
+    dob_str = session.get("dob")
+    is_birthday = False
+    if dob_str:
+        dob = datetime.fromisoformat(dob_str).date()
+        is_birthday = is_user_birthday(dob)
+
     return render_template(
         "index.html",
         dob = dob.isoformat(),
@@ -270,6 +295,7 @@ def profile():
         activity=activity,
         gender=gender,
         goal_weight=goal_weight,
+        is_birthday=is_birthday
     )
 
 @app.route("/stats", methods=["GET", "POST"])
@@ -320,6 +346,10 @@ def stats():
     if 'water_glasses' not in session or session.get("water_date") != current_date:
         session["water_glasses"] = 0
         session["water_date"] = current_date
+
+    percent_water = session["water_glasses"] * 0.25 / water_intake if water_intake else 0
+    session["show_water_logo"] = percent_water >= 0.9
+
 
     #if request.args.get('click_glass'):
      #   session["water_glasses"] += 1
@@ -376,6 +406,10 @@ def stats():
         goal_weight=goal_weight,
         weight=weight
     )
+
+def is_user_birthday(dob):
+    today = date.today()
+    return dob.month == today.month and dob.day == today.day
 
 
 @app.route("/remove_water_glass", methods=["POST"])
@@ -569,7 +603,13 @@ def update_password():
             except requests.exceptions.RequestException:
                 error = "Old password is incorrect. Please try again."
 
-    return render_template("update_password.html", error=error, current_route=request.endpoint)
+    dob_str = session.get("dob")
+    is_birthday = False
+    if dob_str:
+        dob = datetime.fromisoformat(dob_str).date()
+        is_birthday = is_user_birthday(dob)
+
+    return render_template("update_password.html", error=error, current_route=request.endpoint, is_birthday=is_birthday)
 
 if __name__ == "__main__":
     app.run(debug=True)

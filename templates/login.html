@@ -132,7 +132,16 @@
             text-align: center;
           "></div>
 
-          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="logo" class="col-md-2 col-6" style="display: block; margin-left: auto; margin-right: auto;">
+          <img src="{% if is_birthday %}
+              {{ url_for('static', filename='Snacky birthday.png') }}
+            {% elif session.get('show_water_logo') %}
+              {{ url_for('static', filename='Snacky water.png') }}
+            {% else %}
+              {{ url_for('static', filename='logo.jpg') }}
+            {% endif %}"
+          alt="logo" 
+          class="col-md-2" 
+          style="display: block; margin-left: auto; margin-right: auto;">
         </div>
       </div>
 
