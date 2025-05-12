@@ -149,7 +149,8 @@
       <div class="row">
         <div class="col-lg-4 col-md-8 col-12" style="display: block; margin-left: auto; margin-right: auto;">
           <form method="post">
-            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+            <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
+              <label style="display: block; margin-bottom: 5px;" for="dob">Date of Birth</label>
               <input
                 type="date"
                 class="form-control"
@@ -159,12 +160,11 @@
                 placeholder="Date of Birth"
                 required
                 max="{{ current_date }}"
-                oninput="toggleLabel(this)"
               />
             </div>
 
-            <div class="mb-3" style="padding-bottom: 6%; padding-top: 6%;">
-              
+            <div class="mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
+              <label style="display: block; margin-bottom: 5px;" for="gender">Gender</label>
               <select class="form-select" name="gender" id="gender" required>
                 <option value="">Gender</option>
                 <option value="male" {% if gender == "male" %}selected{% endif %}>Male</option>
@@ -173,7 +173,8 @@
               </select>
             </div>
 
-            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+            <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
+             <label style="display: block; margin-bottom: 5px;" for="height">Height</label>
               <input
                 type="number"
                 class="form-control"
@@ -185,12 +186,11 @@
                 step="0.1"
                 min="120"
                 max="250"
-                oninput="toggleLabel(this)"
               />
-              <span class="input-label-right" id="label-height">Height (cm)</span>
             </div>
 
-            <div class="input-wrapper mb-3" style="padding-bottom: 6%; padding-top: 6%;">
+            <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
+              <label style="display: block; margin-bottom: 5px;" for="weight">Weight (kg)</label>
               <input
                 type="number"
                 class="form-control"
@@ -202,12 +202,10 @@
                 step="0.1"
                 min="30"
                 max="300"
-                oninput="toggleLabel(this)"
               />
-              <span class="input-label-right" id="label-weight">Weight (kg)</span>
             </div>
 
-            <div class="mb-4" style="padding-bottom: 6%;">
+            <div class="mb-4" style="padding-bottom: 0%;">
               <div class="h5">
                 <label class="form-label d-block mb-1">Activity Level</label>
                 {% set explanations = {
