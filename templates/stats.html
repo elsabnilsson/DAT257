@@ -207,35 +207,33 @@
           </div>
         </div>
 
-        <div class="mt-5" style="max-width: 600px; margin: auto;">
-          <h5 class="text-center">Daily water intake over time</h5>
-          <canvas id="waterChart" width="400" height="200"></canvas>
-        </div>
+<!-- Water Chart Section -->
+<div class="mb-5" style="display: grid; grid-template-columns: 200px 1fr 200px; align-items: center; justify-content: center; gap: 20px;">
+  
+  <!-- Empty left column (no mascot) -->
+  <div style="grid-column: 1 / 2; grid-row: 1 / 2;"></div>
+
+  <!-- Center chart -->
+  <div style="grid-column: 2 / 3; grid-row: 1 / 2; text-align: center;">
+    <h5 class="text-center">Daily Water Intake Over Time</h5>
+    <canvas id="waterChart" width="450" height="300"></canvas>
+  </div>
+
+  <!-- Empty right column -->
+  <div style="grid-column: 3 / 4; grid-row: 1 / 2;"></div>
+</div>
+
+        
+
 
       </div>
+
+
+
     </div>
   </div>
 
-          <script>
-            const weight = {{ weight | default(0) }};
-            const goalWeight = {{ goal_weight | default('null') }};
-          
-            let message = "";
-            if (goalWeight === null) {
-              message = "dem gainZzZZZ brah!";
-            } else if (weight > goalWeight + 0.5) {
-              message = "u need to cut brah. snackrobat believes in YOU!!!!!!";
-            } else if (weight < goalWeight - 0.5) {
-              message = "you need to stuff more food in ur face. i believe in you. you can do it.";
-            } else {
-              message = "You seem satisfied with your weight, wheres your ambition??";
-            }
-            
-            const goalMessageElement = document.getElementById("goalMessage");
-            if (goalMessageElement) {
-              goalMessageElement.textContent = message;
-            }
-          </script>
+
 
           <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
           <script>
@@ -273,10 +271,30 @@
 
       
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+      <script>
+        const weight = {{ weight | default(0) }};
+        const goalWeight = {{ goal_weight | default(0) }};
+
+        let message = "";
+        if (goalWeight === null) {
+          message = "dem gainZzZZZ brah!";
+        } else if (weight > goalWeight + 0.5) {
+          message = "u need to cut brah. snackrobat believes in YOU!!!!!!";
+        } else if (weight < goalWeight - 0.5) {
+          message = "you need to stuff more food in ur face. i believe in you. you can do it.";
+        } else {
+          message = "You seem satisfied with your weight, wheres your ambition??";
+        }
+        
+        const goalMessageElement = document.getElementById("goalMessage");
+        if (goalMessageElement) {
+          goalMessageElement.textContent = message;
+        }
+      </script>
       
       <script>
         const weightLog = {{ weight_log | tojson }};
-        const goalWeight = {{ goal_weight | default(0) }};
         currentWeight = {{ current_weight | default(0) }};
 
         const dates = weightLog.map(entry => new Date(entry.timestamp).toLocaleDateString());
