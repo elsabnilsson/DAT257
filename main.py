@@ -339,7 +339,14 @@ def stats():
     meal_plan = strategy.meal_spli(calories, protein, fat, carbs)
     
     water_log = user_info.get("water_log", [])
-    water_log_sorted = sorted(water_log, key=lambda x: x["date"])
+    
+    latest_water_log = {}
+    for entry in water_log:
+        date_str = entry["date"]
+        if date_str not in latest_water_log or entry["glasses"] > latest_water_log[date_str]["glasses"]:
+            latest_water_log[date_str] = entry
+
+    water_log_sorted = sorted(latest_water_log.values(), key=lambda x: x["date"])
     session["water_log"] = water_log_sorted
     
     current_date = date.today().strftime("%Y-%m-%d")
@@ -347,27 +354,13 @@ def stats():
         session["water_glasses"] = 0
         session["water_date"] = current_date
 
-    percent_water = session["water_glasses"] * 0.25 / water_intake if water_intake else 0
-    session["show_water_logo"] = percent_water >= 0.9
-
-
-    #if request.args.get('click_glass'):
-     #   session["water_glasses"] += 1
-
-    
-    water_intake = session.get("water_intake", 0)  # recommended daily intake
-    glasses_count = math.ceil(water_intake / 0.25)  # recomended daily intake in glasses
-
     if request.args.get('click_glass'):
-        current_date = date.today().strftime("%Y-%m-%d")
         if session["water_date"] != current_date:
             session["water_glasses"] = 0
             session["water_date"] = current_date
 
         session["water_glasses"] += 1
 
-        # store to database
-        user_ref = db.collection("users").document(session["user_uid"])
         user_ref.update({
             "water_log": ArrayUnion([{
                 "date": current_date,
@@ -402,9 +395,9 @@ def stats():
         body_age=body_age,
         weight_log=weight_log,
         water_glasses=session.get("water_glasses", 0),
-        water_log=session.get("water_log", []),
+        water_log=water_log_sorted,
         goal_weight=goal_weight,
-        weight=weight
+        weight=weight,
     )
 
 def is_user_birthday(dob):
@@ -414,13 +407,40 @@ def is_user_birthday(dob):
 
 @app.route("/remove_water_glass", methods=["POST"])
 def remove_water_glass():
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
+    
+    user_ref = db.collection("users").document(user_uid)
+    
     current_date = date.today().strftime("%Y-%m-%d")
+    
     if session.get("water_date") != current_date:
         session["water_glasses"] = 0
         session["water_date"] = current_date
 
     if session.get("water_glasses", 0) > 0:
         session["water_glasses"] -= 1
+        
+        user_data = user_ref.get()
+        if not user_data.exists:
+            return "User profile not found", 404
+            
+        user_info = user_data.to_dict()
+        water_log = user_info.get("water_log", [])
+        
+        water_log_sorted = [entry for entry in water_log if entry["date"] != current_date]
+        
+        updated_entry = {
+            "date": current_date,
+            "glasses": session["water_glasses"]
+        }
+        water_log_sorted.append(updated_entry)
+        
+        user_ref.update({
+            "water_log": water_log_sorted
+        })
+        
     return redirect(url_for("stats"))
 
 
