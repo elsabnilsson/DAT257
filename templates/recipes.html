@@ -184,7 +184,7 @@
                       <p class="mb-1">Calories: <br> {{ r.nutrition.nutrients | selectattr("name","equalto","Calories") | map(attribute="amount") | first }} kcal</p>
                     </div>
                   </div>
-                  <a href="https://spoonacular.com/recipes/{{ r.id }}" target="_blank"
+                  <a href="{{ url_for('recipe_detail', recipe_id=r.id) }}"
                       class="btn w-100"
                       style="background-color:#433118; color:white; border:none; border-radius:0.5rem; margin-top: 1rem; margin-bottom: 1rem;">
                     View Recipe

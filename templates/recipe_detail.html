@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h1 class="mb-4">{{ recipe.title }}</h1>
+  <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="img-fluid mb-4" style="max-height: 400px; object-fit: cover;">
+  <h3>Summary</h3>
+  <div>{{ recipe.summary | safe }}</div>
+
+  <h3 class="mt-4">Ingredients</h3>
+  <ul>
+    {% for ing in recipe.extendedIngredients %}
+      <li>{{ ing.original }}</li>
+    {% endfor %}
+  </ul>
+
+  <h3 class="mt-4">Instructions</h3>
+  {% if recipe.instructions %}
+    <div>{{ recipe.instructions | safe }}</div>
+  {% else %}
+    <p>No instructions available.</p>
+  {% endif %}
+
+  <h3 class="mt-4">Nutrition</h3>
+  <ul>
+    {% for nutrient in recipe.nutrition.nutrients %}
+      <li>{{ nutrient.name }}: {{ nutrient.amount }} {{ nutrient.unit }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('recipes') }}" class="btn btn-secondary mt-4">← Back to Recipes</a>
+</div>
+{% endblock %}

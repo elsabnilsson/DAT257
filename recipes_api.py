@@ -73,3 +73,18 @@ def get_recipes(
         print("❌ API error", resp.status_code, resp.text)
     resp.raise_for_status()
     return resp.json()
+
+def get_recipe_information(recipe_id: int) -> dict:
+    """Fetch full recipe details (including nutrition) from Spoonacular."""
+    url = f"https://{API_HOST}/recipes/{recipe_id}/information"
+    headers = {
+        "x-rapidapi-host": API_HOST,
+        "x-rapidapi-key": API_KEY,
+    }
+    params = {
+        "includeNutrition": "true"
+    }
+    resp = requests.get(url, headers=headers, params=params)
+    resp.raise_for_status()
+    return resp.json()
+

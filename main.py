@@ -21,6 +21,8 @@ from flask import make_response, jsonify
 FIREBASE_API_KEY = "AIzaSyCrlsFF_qHY40TczFJ6jmZEmcKcHY__fmg"
 from body_age import BodyAge
 from workouts import search_exercises_by_body_part, filter_exercises
+from recipes_api import get_recipes, get_recipe_information
+
 
 
 
@@ -571,6 +573,26 @@ def change_password():
         return redirect(url_for("login"))
 
     return render_template("change_password.html", current_route=request.endpoint)
+
+
+@app.route("/recipes/<int:recipe_id>")
+@nocache
+def recipe_detail(recipe_id):
+    user_uid = session.get("user_uid")
+    if not user_uid:
+        return redirect(url_for("login"))
+
+    # Fetch full recipe info
+    try:
+        recipe = get_recipe_information(recipe_id)
+    except Exception as e:
+        flash(f"Could not load recipe: {e}", "error")
+        return redirect(url_for("recipes"))
+
+    return render_template("recipe_detail.html",
+                           recipe=recipe,
+                           current_route=request.endpoint)
+
 
 
 @app.route("/update_password", methods=["GET", "POST"])
