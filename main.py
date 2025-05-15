@@ -287,6 +287,7 @@ def profile():
         dob = datetime.fromisoformat(dob_str).date()
         is_birthday = is_user_birthday(dob)
 
+    current_date = date.today().isoformat()
     return render_template(
         "index.html",
         dob = dob.isoformat(),
@@ -295,7 +296,8 @@ def profile():
         activity=activity,
         gender=gender,
         goal_weight=goal_weight,
-        is_birthday=is_birthday
+        is_birthday=is_birthday,
+        current_date=current_date
     )
 
 @app.route("/stats", methods=["GET", "POST"])

@@ -168,7 +168,7 @@
           <form method="post">
             <div class="input-wrapper mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
               <label style="display: block; margin-bottom: 5px;" for="dob">Date of Birth</label>
-              <input type="date" class="form-control" name="dob" id="dob" value="{{ dob }}" required max="{{ current_date }}">
+              <input type="date" class="form-control" name="dob" id="dob" value="{{ dob }}" min="2000-03-01" max="{{ current_date }}">
             </div>
 
             <div class="mb-3" style="padding-bottom: 3%; padding-top: 3%; text-align: left;">
