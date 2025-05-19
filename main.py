@@ -523,12 +523,13 @@ def workouts():
         current = user["weight"]
         goal = user["goal_weight"]
 
-        if goal < current:
-            advice = "För att gå ner i vikt, överväg att öka träningsintensiteten, exempelvis med mer cardio."
-        elif goal > current:
-            advice = "För att öka i vikt, fokusera på tung styrketräning och tillräckligt proteinintag."
-        else:
-            advice = "Du har redan nått din målvikt – håll igång med balanserad träning."
+    if goal < current:
+        advice = "To lose weight, consider increasing the intensity of your workouts, for example with more cardio."
+    elif goal > current:
+        advice = "To gain weight, focus on heavy strength training and adequate protein intake."
+    else:
+        advice = "You have already reached your target weight – maintain it with balanced training."
+
 
     if body_part:
         try:
